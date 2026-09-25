@@ -1,98 +1,55 @@
 export default async function handler(request, response) {
   try {
+    const API_KEY = process.env.API_FOOTBALL_KEY;
+
+    if (!API_KEY) {
+      return response.status(500).json({
+        error: "Falta configurar API_FOOTBALL_KEY en Vercel"
+      });
+    }
+
+    const headers = {
+      "x-apisports-key": API_KEY
+    };
+
+    // Fecha actual
     const ahora = new Date();
 
     const hoy = ahora.toISOString().split("T")[0];
 
-    const mananaFecha = new Date(
-      ahora.getTime() + 24 * 60 * 60 * 1000
-    );
-
+    const mananaFecha = new Date(ahora);
+    mananaFecha.setUTCDate(mananaFecha.getUTCDate() + 1);
     const manana = mananaFecha.toISOString().split("T")[0];
 
-    const apiResponse = await fetch(
-      `https://v3.football.api-sports.io/fixtures?from=${hoy}&to=${manana}`,
+    /*
+     * ==========================================================
+     * 1. PARTIDOS EN VIVO
+     * ==========================================================
+     *
+     * live=all obtiene TODOS los partidos en vivo
+     * de todas las ligas disponibles.
+     */
+    const liveResponse = await fetch(
+      "https://v3.football.api-sports.io/fixtures?live=all",
       {
-        headers: {
-          "x-apisports-key": process.env.API_FOOTBALL_KEY
-        }
+        headers
       }
     );
 
-    const data = await apiResponse.json();
+    const liveData = await liveResponse.json();
 
-    if (!apiResponse.ok) {
-      return response.status(apiResponse.status).json(data);
+    if (!liveResponse.ok) {
+      return response.status(liveResponse.status).json({
+        error: "Error obteniendo partidos en vivo",
+        detalles: liveData
+      });
     }
 
-    const partidos = data.response || [];
+    const enVivo = liveData.response || [];
 
-    const estadosEnVivo = [
-      "1H",
-      "2H",
-      "HT",
-      "ET",
-      "BT",
-      "P",
-      "SUSP",
-      "INT",
-      "LIVE"
-    ];
-
-    const estadosFinalizados = [
-      "FT",
-      "AET",
-      "PEN"
-    ];
-
-    const enVivo = partidos.filter((partido) =>
-      estadosEnVivo.includes(partido.fixture.status.short)
-    );
-
-    const resultados = partidos.filter((partido) =>
-      estadosFinalizados.includes(partido.fixture.status.short)
-    );
-
-    const proximos = partidos.filter((partido) => {
-
-      const estado = partido.fixture.status.short;
-
-      if (estado !== "NS") {
-        return false;
-      }
-
-      const inicio = new Date(partido.fixture.date);
-
-      return (
-        inicio >= ahora &&
-        inicio <= mananaFecha
-      );
-
-    });
-
-    proximos.sort((a, b) =>
-      new Date(a.fixture.date) -
-      new Date(b.fixture.date)
-    );
-
-    resultados.sort((a, b) =>
-      new Date(b.fixture.date) -
-      new Date(a.fixture.date)
-    );
-
-    return response.status(200).json({
-      enVivo,
-      resultados,
-      proximos,
-      actualizado: new Date().toISOString()
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    return response.status(500).json({
-      error: "No se pudieron obtener los partidos"
-    });
-  }
-}
+    /*
+     * ==========================================================
+     * 2. PARTIDOS DE HOY Y MAÑANA
+     * ==========================================================
+     */
+    const fixturesResponse = await fetch
