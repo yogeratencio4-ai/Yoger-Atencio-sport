@@ -1,92 +1,375 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yoger Atencio SPORT</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<title>Yoger Atencio SPORT</title>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0b0b;
-      color: white;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    header {
-      background: #151515;
-      text-align: center;
-      padding: 25px 15px;
-      border-bottom: 2px solid #00ff66;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #08110d;
+  color: white;
+}
 
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
+header {
+  background: #0d1f16;
+  padding: 18px 12px;
+  text-align: center;
+  border-bottom: 2px solid #19d66b;
+}
 
-    .live {
-      color: #00ff66;
-      font-weight: bold;
-    }
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
 
-    main {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
+.subtitle {
+  color: #19d66b;
+  font-weight: bold;
+  margin-top: 6px;
+}
 
-    .partido {
-      background: #1a1a1a;
-      margin: 15px 0;
-      padding: 20px;
-      border-radius: 12px;
-    }
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
+}
 
-    .partido h3 {
-      margin-top: 0;
-    }
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
-    .boton {
-      display: inline-block;
-      background: #00ff66;
-      color: #000;
-      padding: 12px 18px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
+h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+button {
+  background: #19d66b;
+  color: #031108;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: bold;
+}
+
+#status {
+  color: #aaa;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.match {
+  background: #102019;
+  border: 1px solid #1d3a2a;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.league {
+  font-size: 13px;
+  color: #19d66b;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.team img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.team-name {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.vs {
+  color: #aaa;
+  font-weight: bold;
+}
+
+.time {
+  margin-top: 12px;
+  text-align: center;
+  color: #ddd;
+}
+
+.live {
+  display: inline-block;
+  background: #d60000;
+  color: white;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: 800;
+  margin-top: 8px;
+}
+
+.empty {
+  background: #102019;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: #aaa;
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <h1>⚽ YOGER ATENCIO SPORT</h1>
-    <p class="live">🔴 FÚTBOL EN VIVO</p>
-  </header>
+<header>
+  <h1>⚽ YOGER ATENCIO SPORT</h1>
+  <div class="subtitle">🔴 FÚTBOL EN VIVO</div>
+</header>
 
-  <main>
+<main>
 
-    <h2>📺 Partidos de hoy</h2>
+  <div class="topbar">
+    <h2>📺 Partidos</h2>
 
-    <div class="partido">
-      <h3>⚽ Partido en vivo</h3>
-      <p>Transmisión disponible próximamente</p>
-      <a class="boton" href="#">VER EN VIVO</a>
-    </div>
+    <button onclick="loadMatches()">
+      🔄 Actualizar
+    </button>
+  </div>
 
-    <div class="partido">
-      <h3>⚽ Próximo partido</h3>
-      <p>Horario y transmisión próximamente</p>
-      <a class="boton" href="#">VER PARTIDO</a>
-    </div>
+  <div id="status">
+    Cargando partidos...
+  </div>
 
-  </main>
+  <div id="matches"></div>
+
+</main>
+
+<script>
+
+const liveStatuses = new Set([
+  "1H",
+  "2H",
+  "HT",
+  "ET",
+  "BT",
+  "P",
+  "SUSP",
+  "INT",
+  "LIVE"
+]);
+
+function escapeHtml(value) {
+
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+
+}
+
+function formatTime(dateString) {
+
+  const d = new Date(dateString);
+
+  return d.toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+}
+
+async function loadMatches() {
+
+  const status = document.getElementById("status");
+  const container = document.getElementById("matches");
+
+  status.textContent = "Cargando partidos...";
+
+  try {
+
+    const res = await fetch("/api/football", {
+      cache: "no-store"
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.errors?.token) {
+      throw new Error(
+        data.errors?.token || "Error de la API"
+      );
+    }
+
+    const matches = Array.isArray(data.response)
+      ? data.response
+      : [];
+
+    matches.sort((a, b) => {
+
+      const aLive = liveStatuses.has(
+        a.fixture?.status?.short
+      );
+
+      const bLive = liveStatuses.has(
+        b.fixture?.status?.short
+      );
+
+      if (aLive !== bLive) {
+        return bLive - aLive;
+      }
+
+      return new Date(a.fixture.date)
+        - new Date(b.fixture.date);
+
+    });
+
+    if (!matches.length) {
+
+      container.innerHTML =
+        '<div class="empty">No hay partidos para hoy.</div>';
+
+      status.textContent =
+        "0 partidos encontrados";
+
+      return;
+    }
+
+    container.innerHTML = matches.map(m => {
+
+      const f = m.fixture || {};
+      const l = m.league || {};
+      const h = m.teams?.home || {};
+      const a = m.teams?.away || {};
+
+      const hs = m.goals?.home;
+      const as = m.goals?.away;
+
+      const live = liveStatuses.has(
+        f.status?.short
+      );
+
+      return `
+
+        <div class="match">
+
+          <div class="league">
+            ${escapeHtml(l.name)}
+            ·
+            ${escapeHtml(l.country)}
+          </div>
+
+          <div class="teams">
+
+            <div class="team">
+
+              <img
+                src="${escapeHtml(h.logo || "")}"
+                alt=""
+              >
+
+              <div class="team-name">
+                ${escapeHtml(h.name)}
+              </div>
+
+            </div>
+
+            <div class="vs">
+
+              ${
+                live
+                ? `
+                  <span class="live">
+                    🔴 EN VIVO
+                  </span>
+
+                  <div class="score">
+                    ${hs ?? 0} - ${as ?? 0}
+                  </div>
+                `
+                : "VS"
+              }
+
+            </div>
+
+            <div class="team">
+
+              <img
+                src="${escapeHtml(a.logo || "")}"
+                alt=""
+              >
+
+              <div class="team-name">
+                ${escapeHtml(a.name)}
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="time">
+
+            ${
+              live
+              ? escapeHtml(
+                  f.status?.long || "En vivo"
+                )
+              : "🕐 " + formatTime(f.date)
+            }
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+    status.textContent =
+      `${matches.length} partidos encontrados`;
+
+  } catch (error) {
+
+    container.innerHTML =
+      `<div class="empty">
+        No se pudieron cargar los partidos.
+      </div>`;
+
+    status.textContent =
+      error.message;
+
+  }
+
+}
+
+loadMatches();
+
+</script>
 
 </body>
 </html>
