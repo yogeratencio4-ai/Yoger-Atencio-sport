@@ -46,4 +46,490 @@
     }
 
     .contenedor {
-     
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    .estado {
+      text-align: center;
+      background: #0b2417;
+      border: 1px solid #1c4d31;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 18px;
+    }
+
+    .estado span {
+      color: #55ff91;
+      font-weight: bold;
+    }
+
+    .seccion {
+      margin-bottom: 25px;
+    }
+
+    .titulo-seccion {
+      font-size: 20px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1c4d31;
+    }
+
+    .titulo-vivo {
+      color: #ff4d4d;
+    }
+
+    .partidos {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .partido {
+      background: #0b2417;
+      border: 1px solid #1c4d31;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .liga {
+      color: #55ff91;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .equipos {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .equipo {
+      width: 40%;
+      text-align: center;
+    }
+
+    .marcador {
+      width: 20%;
+      text-align: center;
+      font-size: 18px;
+      color: #55ff91;
+    }
+
+    .hora {
+      text-align: center;
+      margin-top: 10px;
+      color: #c5c5c5;
+      font-size: 13px;
+    }
+
+    .estado-vivo {
+      display: inline-block;
+      background: #d90000;
+      color: white;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .vacio {
+      background: #0b2417;
+      border: 1px dashed #315b42;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      color: #aaa;
+    }
+
+    .error {
+      background: #351010;
+      border: 1px solid #8b3030;
+      color: #ffaaaa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      word-break: break-word;
+    }
+
+    .actualizando {
+      color: #aaa;
+      font-size: 12px;
+      margin-top: 7px;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      padding: 30px 15px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>⚽ YOGER ATENCIO SPORT</h1>
+  <p>PARTIDOS DE FÚTBOL EN VIVO</p>
+</header>
+
+<div class="contenedor">
+
+  <div class="estado">
+    Estado: <span id="estado">Conectando...</span>
+    <div class="actualizando" id="actualizando">
+      Cargando partidos...
+    </div>
+  </div>
+
+  <div id="error"></div>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion titulo-vivo">
+      🔴 EN VIVO
+    </h2>
+
+    <div id="vivo" class="partidos">
+      <div class="vacio">
+        Buscando partidos en vivo...
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion">
+      ⚽ PARTIDOS DE HOY
+    </h2>
+
+    <div id="hoy" class="partidos">
+      <div class="vacio">
+        Cargando partidos...
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion">
+      📅 PRÓXIMOS PARTIDOS
+    </h2>
+
+    <div id="manana" class="partidos">
+      <div class="vacio">
+        Cargando próximos partidos...
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  YOGER ATENCIO SPORT
+</footer>
+
+<script>
+
+  // ==========================================
+  // ELEMENTOS
+  // ==========================================
+
+  const estado = document.getElementById("estado");
+  const actualizando = document.getElementById("actualizando");
+  const errorBox = document.getElementById("error");
+
+  const vivoBox = document.getElementById("vivo");
+  const hoyBox = document.getElementById("hoy");
+  const mananaBox = document.getElementById("manana");
+
+
+  // ==========================================
+  // FORMATO DE HORA
+  // ==========================================
+
+  function formatoHora(fecha) {
+
+    if (!fecha) {
+      return "--:--";
+    }
+
+    const d = new Date(fecha);
+
+    if (isNaN(d.getTime())) {
+      return "--:--";
+    }
+
+    return d.toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+
+  // ==========================================
+  // CREAR TARJETA
+  // ==========================================
+
+  function crearPartido(partido, esVivo = false) {
+
+    if (!partido || !partido.fixture) {
+      return "";
+    }
+
+    const fixture = partido.fixture;
+    const equipos = partido.teams || {};
+    const league = partido.league || {};
+    const goles = partido.goals || {};
+    const status = fixture.status || {};
+
+    const local =
+      equipos.home && equipos.home.name
+        ? equipos.home.name
+        : "Local";
+
+    const visitante =
+      equipos.away && equipos.away.name
+        ? equipos.away.name
+        : "Visitante";
+
+    const liga =
+      league.name
+        ? league.name
+        : "Fútbol";
+
+    let marcador = "";
+
+    if (
+      goles.home !== null &&
+      goles.home !== undefined &&
+      goles.away !== null &&
+      goles.away !== undefined
+    ) {
+      marcador = `${goles.home} - ${goles.away}`;
+    } else {
+      marcador = "VS";
+    }
+
+    let tiempo = "";
+
+    if (esVivo) {
+
+      if (status.elapsed !== null &&
+          status.elapsed !== undefined) {
+
+        tiempo = `
+          <div class="estado-vivo">
+            🔴 EN VIVO ${status.elapsed}'
+          </div>
+        `;
+
+      } else {
+
+        tiempo = `
+          <div class="estado-vivo">
+            🔴 EN VIVO
+          </div>
+        `;
+      }
+
+    } else {
+
+      tiempo = `
+        <div class="hora">
+          🕐 ${formatoHora(fixture.date)}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="partido">
+
+        <div class="liga">
+          ${liga}
+        </div>
+
+        <div class="equipos">
+
+          <div class="equipo">
+            ${local}
+          </div>
+
+          <div class="marcador">
+            ${marcador}
+          </div>
+
+          <div class="equipo">
+            ${visitante}
+          </div>
+
+        </div>
+
+        ${tiempo}
+
+      </div>
+    `;
+  }
+
+
+  // ==========================================
+  // MOSTRAR PARTIDOS
+  // ==========================================
+
+  function mostrarPartidos(lista, elemento, esVivo = false) {
+
+    if (!Array.isArray(lista) || lista.length === 0) {
+
+      elemento.innerHTML = `
+        <div class="vacio">
+          ${
+            esVivo
+              ? "No hay partidos en vivo en este momento."
+              : "No hay partidos disponibles."
+          }
+        </div>
+      `;
+
+      return;
+    }
+
+    elemento.innerHTML = lista
+      .map(partido => crearPartido(partido, esVivo))
+      .join("");
+  }
+
+
+  // ==========================================
+  // CARGAR DATOS
+  // ==========================================
+
+  async function cargarPartidos() {
+
+    try {
+
+      estado.textContent = "Conectando...";
+      errorBox.innerHTML = "";
+
+      const respuesta = await fetch(
+        "/api/football",
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
+
+      const datos = await respuesta.json();
+
+      console.log("RESPUESTA API:", datos);
+
+      if (!respuesta.ok) {
+
+        throw new Error(
+          datos.error ||
+          "Error conectando con el servidor"
+        );
+      }
+
+      if (datos.success === false) {
+
+        throw new Error(
+          datos.error ||
+          "La API devolvió un error"
+        );
+      }
+
+
+      // ======================================
+      // MOSTRAR
+      // ======================================
+
+      mostrarPartidos(
+        datos.enVivo || [],
+        vivoBox,
+        true
+      );
+
+      mostrarPartidos(
+        datos.partidosHoy || [],
+        hoyBox,
+        false
+      );
+
+      mostrarPartidos(
+        datos.partidosManana || [],
+        mananaBox,
+        false
+      );
+
+
+      estado.textContent = "Conectado";
+
+      actualizando.textContent =
+        `Actualizado: ${new Date().toLocaleTimeString("es-ES")}`;
+
+
+    } catch (error) {
+
+      console.error("ERROR:", error);
+
+      estado.textContent = "Error";
+
+      actualizando.textContent =
+        "No se pudieron cargar los partidos.";
+
+      errorBox.innerHTML = `
+        <div class="error">
+          <strong>⚠️ Error:</strong><br>
+          ${error.message}
+          <br><br>
+          Revisa la consola del navegador para más información.
+        </div>
+      `;
+
+      vivoBox.innerHTML = `
+        <div class="vacio">
+          No se pudieron cargar los partidos.
+        </div>
+      `;
+
+      hoyBox.innerHTML = `
+        <div class="vacio">
+          No se pudieron cargar los partidos.
+        </div>
+      `;
+
+      mananaBox.innerHTML = `
+        <div class="vacio">
+          No se pudieron cargar los partidos.
+        </div>
+      `;
+    }
+  }
+
+
+  // ==========================================
+  // INICIAR
+  // ==========================================
+
+  cargarPartidos();
+
+
+  // ==========================================
+  // ACTUALIZAR CADA 60 SEGUNDOS
+  // ==========================================
+
+  setInterval(() => {
+
+    cargarPartidos();
+
+  }, 60000);
+
+</script>
+
+</body>
+</html>
