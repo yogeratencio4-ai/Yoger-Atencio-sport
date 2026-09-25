@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>YOGER ATENCIO SPORT</title>
 
   <style>
@@ -12,14 +13,14 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #07110b;
+      background: #06100a;
       color: white;
+      font-family: Arial, sans-serif;
     }
 
     header {
-      background: #0b1f12;
-      padding: 18px 15px;
+      background: #0b1d11;
+      padding: 20px 15px;
       text-align: center;
       border-bottom: 2px solid #16c763;
     }
@@ -36,7 +37,7 @@
     }
 
     .container {
-      max-width: 700px;
+      max-width: 750px;
       margin: auto;
       padding: 15px;
     }
@@ -45,20 +46,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
       margin-bottom: 15px;
     }
 
     .top h2 {
       margin: 0;
-      font-size: 20px;
+      font-size: 19px;
     }
 
     .refresh {
       background: #16c763;
-      color: #001b09;
       border: 0;
-      padding: 9px 12px;
       border-radius: 8px;
+      padding: 9px 12px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -72,7 +73,7 @@
     }
 
     .league {
-      color: #8de9ae;
+      color: #86e7a8;
       font-size: 13px;
       margin-bottom: 12px;
     }
@@ -81,13 +82,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
       text-align: center;
+      gap: 8px;
     }
 
     .team {
       width: 40%;
       font-weight: bold;
+      font-size: 14px;
     }
 
     .team img {
@@ -99,15 +101,15 @@
     }
 
     .score {
-      font-size: 22px;
+      min-width: 60px;
+      font-size: 21px;
       font-weight: bold;
-      min-width: 55px;
     }
 
     .status {
-      color: #16c763;
-      font-size: 13px;
       margin-top: 5px;
+      font-size: 12px;
+      color: #9ca89f;
     }
 
     .live {
@@ -115,7 +117,7 @@
       font-weight: bold;
     }
 
-    .watch {
+    .video-button {
       width: 100%;
       margin-top: 15px;
       padding: 13px;
@@ -128,60 +130,10 @@
       cursor: pointer;
     }
 
-    .watch.disabled {
-      background: #34433a;
-      color: #aeb8b1;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.8);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 1000;
-    }
-
-    .modal-box {
-      width: 100%;
-      max-width: 400px;
-      background: #102017;
-      border: 1px solid #16c763;
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .modal-box h3 {
-      margin-top: 0;
-    }
-
-    .option {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 9px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .netcom {
-      background: #16c763;
-      color: #001b09;
-    }
-
-    .official {
-      background: #ffffff;
-      color: #111111;
-    }
-
-    .close {
-      background: #333;
-      color: white;
+    .video-button:disabled {
+      background: #37433b;
+      color: #9aa39d;
+      cursor: default;
     }
 
     .loading,
@@ -189,11 +141,42 @@
     .error {
       text-align: center;
       padding: 30px 10px;
-      color: #b8c4bc;
+      color: #aeb9b1;
     }
 
     .error {
       color: #ff7b72;
+    }
+
+    .video-box {
+      display: none;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .video-title {
+      background: #102017;
+      padding: 13px;
+      font-weight: bold;
+    }
+
+    #videoPlayer {
+      width: 100%;
+    }
+
+    #videoPlayer iframe {
+      width: 100%;
+      min-height: 420px;
+      border: 0;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      #videoPlayer iframe {
+        min-height: 230px;
+      }
     }
   </style>
 </head>
@@ -207,74 +190,92 @@
 
 <div class="container">
 
+  <div id="videoBox" class="video-box">
+    <div id="videoTitle" class="video-title">
+      ▶️ Reproduciendo
+    </div>
+
+    <div id="videoPlayer"></div>
+  </div>
+
   <div class="top">
     <h2>📺 Partidos de hoy</h2>
-    <button class="refresh" onclick="cargarPartidos()">↻ Actualizar</button>
+
+    <button
+      class="refresh"
+      onclick="cargarPartidos()"
+    >
+      ↻ Actualizar
+    </button>
   </div>
 
   <div id="matches">
-    <div class="loading">Cargando partidos...</div>
+    <div class="loading">
+      ⏳ Cargando partidos...
+    </div>
   </div>
 
-</div>
-
-<!-- VENTANA DE OPCIONES -->
-<div class="modal" id="watchModal">
-  <div class="modal-box">
-
-    <h3>📺 Ver partido</h3>
-
-    <p id="selectedMatch"></p>
-
-    <button class="option netcom" onclick="abrirNetcom()">
-      📺 VER EN NETCOM TV
-    </button>
-
-    <button class="option official" onclick="buscarOficial()">
-      🌐 BUSCAR TRANSMISIÓN OFICIAL
-    </button>
-
-    <button class="option close" onclick="cerrarModal()">
-      ✕ Cerrar
-    </button>
-
-  </div>
 </div>
 
 <script>
 
-  let partidoSeleccionado = null;
+  let videosScoreBat = [];
+
+  /*
+   * CARGAR PARTIDOS DE API-FOOTBALL
+   */
 
   async function cargarPartidos() {
 
-    const contenedor = document.getElementById("matches");
+    const contenedor =
+      document.getElementById("matches");
 
     contenedor.innerHTML =
       '<div class="loading">⏳ Cargando partidos...</div>';
 
     try {
 
-      const respuesta = await fetch("/api/football");
+      const respuesta =
+        await fetch("/api/football");
 
       if (!respuesta.ok) {
-        throw new Error("Error API");
+        throw new Error("API Football error");
       }
 
-      const data = await respuesta.json();
+      const data =
+        await respuesta.json();
 
-      if (!data.response || data.response.length === 0) {
+      if (
+        !data.response ||
+        data.response.length === 0
+      ) {
+
         contenedor.innerHTML =
           '<div class="empty">No hay partidos disponibles.</div>';
+
         return;
       }
 
+      /*
+       * Intentamos cargar también
+       * los vídeos gratuitos disponibles.
+       */
+
+      await cargarVideos();
+
       let partidos = data.response;
 
-      // Partidos en vivo primero
       partidos.sort((a, b) => {
 
-        const liveA = esEnVivo(a.fixture.status.short) ? 1 : 0;
-        const liveB = esEnVivo(b.fixture.status.short) ? 1 : 0;
+        const liveA =
+          esEnVivo(a.fixture.status.short)
+            ? 1
+            : 0;
+
+        const liveB =
+          esEnVivo(b.fixture.status.short)
+            ? 1
+            : 0;
 
         return liveB - liveA;
 
@@ -284,12 +285,22 @@
 
       partidos.forEach(partido => {
 
-        const fixture = partido.fixture;
-        const home = partido.teams.home;
-        const away = partido.teams.away;
-        const league = partido.league;
+        const fixture =
+          partido.fixture;
 
-        const enVivo = esEnVivo(fixture.status.short);
+        const home =
+          partido.teams.home;
+
+        const away =
+          partido.teams.away;
+
+        const league =
+          partido.league;
+
+        const enVivo =
+          esEnVivo(
+            fixture.status.short
+          );
 
         let marcador = "";
 
@@ -297,17 +308,16 @@
           fixture.status.short === "NS"
         ) {
 
-          const hora = new Date(
-            fixture.date
-          ).toLocaleTimeString(
-            "es-VE",
-            {
-              hour: "2-digit",
-              minute: "2-digit"
-            }
-          );
-
-          marcador = hora;
+          marcador =
+            new Date(
+              fixture.date
+            ).toLocaleTimeString(
+              "es-VE",
+              {
+                hour: "2-digit",
+                minute: "2-digit"
+              }
+            );
 
         } else {
 
@@ -316,62 +326,91 @@
 
         }
 
-        let estado = fixture.status.long || "";
+        let estado =
+          fixture.status.long || "";
 
         if (enVivo) {
 
           estado =
-            `🔴 EN VIVO ${fixture.status.elapsed ? fixture.status.elapsed + "'" : ""}`;
+            `🔴 EN VIVO ${
+              fixture.status.elapsed
+                ? fixture.status.elapsed + "'"
+                : ""
+            }`;
 
         }
 
-        const card = document.createElement("div");
+        const video =
+          buscarVideo(
+            home.name,
+            away.name
+          );
+
+        const card =
+          document.createElement("div");
 
         card.className = "match";
 
         card.innerHTML = `
 
           <div class="league">
-            ${league.name}
+            ${escapeHTML(league.name)}
           </div>
 
           <div class="teams">
 
             <div class="team">
+
               ${
                 home.logo
-                ? `<img src="${home.logo}" alt="">`
-                : ""
+                  ? `<img src="${home.logo}" alt="">`
+                  : ""
               }
-              ${home.name}
+
+              ${escapeHTML(home.name)}
+
             </div>
 
             <div class="score">
+
               ${marcador}
-              <div class="status ${enVivo ? "live" : ""}">
-                ${estado}
+
+              <div class="status ${
+                enVivo ? "live" : ""
+              }">
+
+                ${escapeHTML(estado)}
+
               </div>
+
             </div>
 
             <div class="team">
+
               ${
                 away.logo
-                ? `<img src="${away.logo}" alt="">`
-                : ""
+                  ? `<img src="${away.logo}" alt="">`
+                  : ""
               }
-              ${away.name}
+
+              ${escapeHTML(away.name)}
+
             </div>
 
           </div>
 
-          <button
-            class="watch"
-            onclick='abrirOpciones(${JSON.stringify(
-              home.name + " vs " + away.name
-            )})'
-          >
-            ▶️ VER EN VIVO
-          </button>
+          ${
+            video
+              ? `
+                <button
+                  class="video-button"
+                  onclick='reproducirVideo(${JSON.stringify(video.embed)}, ${JSON.stringify(home.name + " vs " + away.name)})'
+                >
+                  ▶️ VER VIDEO
+                </button>
+              `
+              : ""
+          }
 
         `;
 
@@ -387,13 +426,198 @@
         <div class="error">
           ❌ No se pudieron cargar los partidos.
           <br><br>
-          Pulsa "Actualizar" para intentar nuevamente.
+          Pulsa "Actualizar".
         </div>
       `;
 
     }
 
   }
+
+
+  /*
+   * INTENTAR OBTENER VIDEOS GRATIS
+   */
+
+  async function cargarVideos() {
+
+    videosScoreBat = [];
+
+    try {
+
+      const respuesta =
+        await fetch(
+          "https://www.scorebat.com/video-api/"
+        );
+
+      if (!respuesta.ok) {
+        return;
+      }
+
+      const data =
+        await respuesta.json();
+
+      if (Array.isArray(data)) {
+
+        videosScoreBat = data;
+
+      } else if (
+        data &&
+        Array.isArray(data.response)
+      ) {
+
+        videosScoreBat =
+          data.response;
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Feed gratuito no disponible:",
+        error
+      );
+
+    }
+
+  }
+
+
+  /*
+   * BUSCAR EL VIDEO DEL PARTIDO
+   */
+
+  function buscarVideo(
+    local,
+    visitante
+  ) {
+
+    if (
+      !videosScoreBat ||
+      videosScoreBat.length === 0
+    ) {
+      return null;
+    }
+
+    const normalLocal =
+      normalizar(local);
+
+    const normalVisitante =
+      normalizar(visitante);
+
+    for (
+      const partido of videosScoreBat
+    ) {
+
+      const home =
+        normalizar(
+          partido.homeTeam?.name || ""
+        );
+
+      const away =
+        normalizar(
+          partido.awayTeam?.name || ""
+        );
+
+      const titulo =
+        normalizar(
+          partido.title || ""
+        );
+
+      const coincideEquipos =
+        (
+          home.includes(normalLocal) ||
+          normalLocal.includes(home)
+        ) &&
+        (
+          away.includes(normalVisitante) ||
+          normalVisitante.includes(away)
+        );
+
+      const coincideTitulo =
+        titulo.includes(normalLocal) &&
+        titulo.includes(normalVisitante);
+
+      if (
+        coincideEquipos ||
+        coincideTitulo
+      ) {
+
+        if (
+          partido.embed
+        ) {
+
+          return {
+            embed: partido.embed
+          };
+
+        }
+
+        if (
+          partido.videos &&
+          partido.videos.length > 0 &&
+          partido.videos[0].embed
+        ) {
+
+          return {
+            embed:
+              partido.videos[0].embed
+          };
+
+        }
+
+      }
+
+    }
+
+    return null;
+
+  }
+
+
+  /*
+   * MOSTRAR REPRODUCTOR
+   */
+
+  function reproducirVideo(
+    embed,
+    titulo
+  ) {
+
+    const box =
+      document.getElementById(
+        "videoBox"
+      );
+
+    const player =
+      document.getElementById(
+        "videoPlayer"
+      );
+
+    const title =
+      document.getElementById(
+        "videoTitle"
+      );
+
+    title.textContent =
+      "▶️ " + titulo;
+
+    player.innerHTML =
+      embed;
+
+    box.style.display =
+      "block";
+
+    box.scrollIntoView({
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /*
+   * ESTADOS EN VIVO
+   */
 
   function esEnVivo(status) {
 
@@ -411,67 +635,48 @@
 
   }
 
-  function abrirOpciones(partido) {
 
-    partidoSeleccionado = partido;
+  /*
+   * NORMALIZAR NOMBRES
+   */
 
-    document.getElementById("selectedMatch").textContent =
-      partido;
+  function normalizar(texto) {
 
-    document.getElementById("watchModal").style.display =
-      "flex";
-
-  }
-
-  function cerrarModal() {
-
-    document.getElementById("watchModal").style.display =
-      "none";
-
-  }
-
-  function abrirNetcom() {
-
-    /*
-      Intentamos abrir Netcom TV.
-
-      Si Android reconoce un enlace de la aplicación,
-      puede abrirla automáticamente.
-
-      Si no lo reconoce, abrimos la web de Netcom.
-    */
-
-    window.location.href =
-      "netcomtv://";
-
-    setTimeout(() => {
-
-      window.open(
-        "https://www.google.com/search?q=Netcom+TV+Venezuela",
-        "_blank"
+    return String(texto)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .replace(
+        /[^a-z0-9]/g,
+        ""
       );
 
-    }, 1200);
+  }
+
+
+  /*
+   * SEGURIDAD BÁSICA PARA TEXTO
+   */
+
+  function escapeHTML(texto) {
+
+    return String(texto)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
   }
 
-  function buscarOficial() {
 
-    if (!partidoSeleccionado) return;
+  /*
+   * INICIAR
+   */
 
-    const consulta =
-      partidoSeleccionado +
-      " transmisión oficial en vivo";
-
-    const url =
-      "https://www.google.com/search?q=" +
-      encodeURIComponent(consulta);
-
-    window.open(url, "_blank");
-
-  }
-
-  // Cargar automáticamente
   cargarPartidos();
 
 </script>
