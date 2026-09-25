@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>YOGER ATENCIO SPORT</title>
-
-  <style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>YOGER ATENCIO SPORT</title>  <style>
     * {
       box-sizing: border-box;
     }
@@ -47,7 +42,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .top h2 {
@@ -62,6 +57,24 @@
       padding: 9px 12px;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    .section-title {
+      margin: 25px 0 12px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .live-title {
+      color: #ff3b30;
+    }
+
+    .result-title {
+      color: #16c763;
+    }
+
+    .next-title {
+      color: #62a8ff;
     }
 
     .match {
@@ -101,13 +114,13 @@
     }
 
     .score {
-      min-width: 60px;
+      min-width: 80px;
       font-size: 21px;
       font-weight: bold;
     }
 
     .status {
-      margin-top: 5px;
+      margin-top: 6px;
       font-size: 12px;
       color: #9ca89f;
     }
@@ -117,23 +130,14 @@
       font-weight: bold;
     }
 
-    .video-button {
-      width: 100%;
-      margin-top: 15px;
-      padding: 13px;
-      border: 0;
-      border-radius: 9px;
-      background: #16c763;
-      color: #001b09;
-      font-size: 15px;
+    .finished {
+      color: #16c763;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    .video-button:disabled {
-      background: #37433b;
-      color: #9aa39d;
-      cursor: default;
+    .upcoming {
+      color: #62a8ff;
+      font-weight: bold;
     }
 
     .loading,
@@ -148,281 +152,197 @@
       color: #ff7b72;
     }
 
-    .video-box {
-      display: none;
-      background: #000;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 20px;
+    .updated {
+      text-align: center;
+      color: #6f7d73;
+      font-size: 11px;
+      margin-top: 20px;
     }
 
-    .video-title {
-      background: #102017;
-      padding: 13px;
-      font-weight: bold;
-    }
-
-    #videoPlayer {
-      width: 100%;
-    }
-
-    #videoPlayer iframe {
-      width: 100%;
-      min-height: 420px;
-      border: 0;
-      display: block;
-    }
-
-    @media (max-width: 600px) {
-      #videoPlayer iframe {
-        min-height: 230px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
+  </style></head><body><header>
   <h1>⚽ YOGER ATENCIO SPORT</h1>
   <p>🔴 FÚTBOL EN VIVO</p>
-</header>
+</header><div class="container">  <div class="top">
+    <h2>⚽ Fútbol</h2><button
+  class="refresh"
+  onclick="cargarPartidos()"
+>
+  ↻ Actualizar
+</button>
 
-<div class="container">
-
-  <div id="videoBox" class="video-box">
-    <div id="videoTitle" class="video-title">
-      ▶️ Reproduciendo
-    </div>
-
-    <div id="videoPlayer"></div>
-  </div>
-
-  <div class="top">
-    <h2>📺 Partidos de hoy</h2>
-
-    <button
-      class="refresh"
-      onclick="cargarPartidos()"
-    >
-      ↻ Actualizar
-    </button>
-  </div>
-
-  <div id="matches">
+  </div>  <!-- EN VIVO -->  <div class="section-title live-title">
+    🔴 EN VIVO
+  </div>  <div id="liveMatches">
     <div class="loading">
-      ⏳ Cargando partidos...
+      ⏳ Buscando partidos en vivo...
     </div>
-  </div>
-
-</div>
-
-<script>
-
-  let videosScoreBat = [];
-
-  /*
-   * CARGAR PARTIDOS DE API-FOOTBALL
-   */
+  </div>  <!-- RESULTADOS -->  <div class="section-title result-title">
+    🏁 RESULTADOS
+  </div>  <div id="resultsMatches">
+    <div class="loading">
+      ⏳ Cargando resultados...
+    </div>
+  </div>  <!-- PRÓXIMOS 24 HORAS -->  <div class="section-title next-title">
+    📅 PRÓXIMOS 24 HORAS
+  </div>  <div id="nextMatches">
+    <div class="loading">
+      ⏳ Cargando próximos partidos...
+    </div>
+  </div>  <div id="updated" class="updated"></div></div><script>
 
   async function cargarPartidos() {
 
-    const contenedor =
-      document.getElementById("matches");
+    const liveContainer =
+      document.getElementById("liveMatches");
 
-    contenedor.innerHTML =
-      '<div class="loading">⏳ Cargando partidos...</div>';
+    const resultsContainer =
+      document.getElementById("resultsMatches");
+
+    const nextContainer =
+      document.getElementById("nextMatches");
+
+
+    liveContainer.innerHTML =
+      '<div class="loading">⏳ Buscando partidos en vivo...</div>';
+
+    resultsContainer.innerHTML =
+      '<div class="loading">⏳ Cargando resultados...</div>';
+
+    nextContainer.innerHTML =
+      '<div class="loading">⏳ Cargando próximos partidos...</div>';
+
 
     try {
 
       const respuesta =
-        await fetch("/api/football");
+        await fetch("/api/football?cache=" + Date.now());
+
 
       if (!respuesta.ok) {
-        throw new Error("API Football error");
+        throw new Error("Error de API");
       }
+
 
       const data =
         await respuesta.json();
 
-      if (
-        !data.response ||
-        data.response.length === 0
-      ) {
 
-        contenedor.innerHTML =
-          '<div class="empty">No hay partidos disponibles.</div>';
+      const enVivo =
+        data.enVivo || [];
 
-        return;
-      }
+      const resultados =
+        data.resultados || [];
 
-      /*
-       * Intentamos cargar también
-       * los vídeos gratuitos disponibles.
-       */
+      const proximos =
+        data.proximos || [];
 
-      await cargarVideos();
 
-      let partidos = data.response;
+      /* =========================
+         EN VIVO
+      ========================= */
 
-      partidos.sort((a, b) => {
+      if (enVivo.length === 0) {
 
-        const liveA =
-          esEnVivo(a.fixture.status.short)
-            ? 1
-            : 0;
-
-        const liveB =
-          esEnVivo(b.fixture.status.short)
-            ? 1
-            : 0;
-
-        return liveB - liveA;
-
-      });
-
-      contenedor.innerHTML = "";
-
-      partidos.forEach(partido => {
-
-        const fixture =
-          partido.fixture;
-
-        const home =
-          partido.teams.home;
-
-        const away =
-          partido.teams.away;
-
-        const league =
-          partido.league;
-
-        const enVivo =
-          esEnVivo(
-            fixture.status.short
-          );
-
-        let marcador = "";
-
-        if (
-          fixture.status.short === "NS"
-        ) {
-
-          marcador =
-            new Date(
-              fixture.date
-            ).toLocaleTimeString(
-              "es-VE",
-              {
-                hour: "2-digit",
-                minute: "2-digit"
-              }
-            );
-
-        } else {
-
-          marcador =
-            `${partido.goals.home ?? 0} - ${partido.goals.away ?? 0}`;
-
-        }
-
-        let estado =
-          fixture.status.long || "";
-
-        if (enVivo) {
-
-          estado =
-            `🔴 EN VIVO ${
-              fixture.status.elapsed
-                ? fixture.status.elapsed + "'"
-                : ""
-            }`;
-
-        }
-
-        const video =
-          buscarVideo(
-            home.name,
-            away.name
-          );
-
-        const card =
-          document.createElement("div");
-
-        card.className = "match";
-
-        card.innerHTML = `
-
-          <div class="league">
-            ${escapeHTML(league.name)}
+        liveContainer.innerHTML = `
+          <div class="empty">
+            ⚽ No hay partidos en vivo en este momento.
           </div>
-
-          <div class="teams">
-
-            <div class="team">
-
-              ${
-                home.logo
-                  ? `<img src="${home.logo}" alt="">`
-                  : ""
-              }
-
-              ${escapeHTML(home.name)}
-
-            </div>
-
-            <div class="score">
-
-              ${marcador}
-
-              <div class="status ${
-                enVivo ? "live" : ""
-              }">
-
-                ${escapeHTML(estado)}
-
-              </div>
-
-            </div>
-
-            <div class="team">
-
-              ${
-                away.logo
-                  ? `<img src="${away.logo}" alt="">`
-                  : ""
-              }
-
-              ${escapeHTML(away.name)}
-
-            </div>
-
-          </div>
-
-          ${
-            video
-              ? `
-                <button
-                  class="video-button"
-                  onclick='reproducirVideo(${JSON.stringify(video.embed)}, ${JSON.stringify(home.name + " vs " + away.name)})'
-                >
-                  ▶️ VER VIDEO
-                </button>
-              `
-              : ""
-          }
-
         `;
 
-        contenedor.appendChild(card);
+      } else {
 
-      });
+        liveContainer.innerHTML = "";
+
+        enVivo.forEach(partido => {
+
+          liveContainer.appendChild(
+            crearPartido(partido, "live")
+          );
+
+        });
+
+      }
+
+
+      /* =========================
+         RESULTADOS
+      ========================= */
+
+      if (resultados.length === 0) {
+
+        resultsContainer.innerHTML = `
+          <div class="empty">
+            No hay resultados disponibles.
+          </div>
+        `;
+
+      } else {
+
+        resultsContainer.innerHTML = "";
+
+        resultados.forEach(partido => {
+
+          resultsContainer.appendChild(
+            crearPartido(partido, "finished")
+          );
+
+        });
+
+      }
+
+
+      /* =========================
+         PRÓXIMOS
+      ========================= */
+
+      if (proximos.length === 0) {
+
+        nextContainer.innerHTML = `
+          <div class="empty">
+            No hay partidos programados
+            para las próximas 24 horas.
+          </div>
+        `;
+
+      } else {
+
+        nextContainer.innerHTML = "";
+
+        proximos.forEach(partido => {
+
+          nextContainer.appendChild(
+            crearPartido(partido, "upcoming")
+          );
+
+        });
+
+      }
+
+
+      /* =========================
+         ACTUALIZACIÓN
+      ========================= */
+
+      const ahora =
+        new Date();
+
+      document.getElementById("updated").textContent =
+        "Actualizado: " +
+        ahora.toLocaleTimeString(
+          "es-VE",
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+          }
+        );
+
 
     } catch (error) {
 
       console.error(error);
 
-      contenedor.innerHTML = `
+      liveContainer.innerHTML = `
         <div class="error">
           ❌ No se pudieron cargar los partidos.
           <br><br>
@@ -430,256 +350,254 @@
         </div>
       `;
 
-    }
-
-  }
-
-
-  /*
-   * INTENTAR OBTENER VIDEOS GRATIS
-   */
-
-  async function cargarVideos() {
-
-    videosScoreBat = [];
-
-    try {
-
-      const respuesta =
-        await fetch(
-          "https://www.scorebat.com/video-api/"
-        );
-
-      if (!respuesta.ok) {
-        return;
-      }
-
-      const data =
-        await respuesta.json();
-
-      if (Array.isArray(data)) {
-
-        videosScoreBat = data;
-
-      } else if (
-        data &&
-        Array.isArray(data.response)
-      ) {
-
-        videosScoreBat =
-          data.response;
-
-      }
-
-    } catch (error) {
-
-      console.log(
-        "Feed gratuito no disponible:",
-        error
-      );
+      resultsContainer.innerHTML = "";
+      nextContainer.innerHTML = "";
 
     }
 
   }
 
 
-  /*
-   * BUSCAR EL VIDEO DEL PARTIDO
-   */
+  /* =========================
+     CREAR PARTIDO
+  ========================= */
 
-  function buscarVideo(
-    local,
-    visitante
+  function crearPartido(
+    partido,
+    tipo
   ) {
 
-    if (
-      !videosScoreBat ||
-      videosScoreBat.length === 0
-    ) {
-      return null;
+    const fixture =
+      partido.fixture;
+
+    const home =
+      partido.teams.home;
+
+    const away =
+      partido.teams.away;
+
+    const league =
+      partido.league;
+
+
+    const golesHome =
+      partido.goals.home ?? 0;
+
+    const golesAway =
+      partido.goals.away ?? 0;
+
+
+    let marcador = "";
+    let estado = "";
+
+
+    /* EN VIVO */
+
+    if (tipo === "live") {
+
+      marcador =
+        `${golesHome} - ${golesAway}`;
+
+
+      const minuto =
+        fixture.status.elapsed;
+
+
+      if (fixture.status.short === "HT") {
+
+        estado =
+          "🔴 DESCANSO";
+
+      } else if (minuto) {
+
+        estado =
+          `🔴 EN VIVO ${minuto}'`;
+
+      } else {
+
+        estado =
+          "🔴 EN VIVO";
+
+      }
+
     }
 
-    const normalLocal =
-      normalizar(local);
 
-    const normalVisitante =
-      normalizar(visitante);
+    /* FINALIZADO */
 
-    for (
-      const partido of videosScoreBat
-    ) {
+    else if (tipo === "finished") {
 
-      const home =
-        normalizar(
-          partido.homeTeam?.name || ""
-        );
+      marcador =
+        `${golesHome} - ${golesAway}`;
 
-      const away =
-        normalizar(
-          partido.awayTeam?.name || ""
-        );
-
-      const titulo =
-        normalizar(
-          partido.title || ""
-        );
-
-      const coincideEquipos =
-        (
-          home.includes(normalLocal) ||
-          normalLocal.includes(home)
-        ) &&
-        (
-          away.includes(normalVisitante) ||
-          normalVisitante.includes(away)
-        );
-
-      const coincideTitulo =
-        titulo.includes(normalLocal) &&
-        titulo.includes(normalVisitante);
 
       if (
-        coincideEquipos ||
-        coincideTitulo
+        fixture.status.short === "AET"
       ) {
 
-        if (
-          partido.embed
-        ) {
+        estado =
+          "FINAL - PRÓRROGA";
 
-          return {
-            embed: partido.embed
-          };
+      } else if (
+        fixture.status.short === "PEN"
+      ) {
 
-        }
+        estado =
+          "FINAL - PENALTIS";
 
-        if (
-          partido.videos &&
-          partido.videos.length > 0 &&
-          partido.videos[0].embed
-        ) {
+      } else {
 
-          return {
-            embed:
-              partido.videos[0].embed
-          };
-
-        }
+        estado =
+          "FINAL";
 
       }
 
     }
 
-    return null;
+
+    /* PRÓXIMO */
+
+    else {
+
+      const fecha =
+        new Date(fixture.date);
+
+
+      marcador =
+        fecha.toLocaleTimeString(
+          "es-VE",
+          {
+            hour: "2-digit",
+            minute: "2-digit"
+          }
+        );
+
+
+      estado =
+        fecha.toLocaleDateString(
+          "es-VE",
+          {
+            day: "2-digit",
+            month: "2-digit"
+          }
+        );
+
+    }
+
+
+    const card =
+      document.createElement("div");
+
+
+    card.className =
+      "match";
+
+
+    card.innerHTML = `
+
+      <div class="league">
+        ${escapeHTML(league.name)}
+      </div>
+
+
+      <div class="teams">
+
+
+        <div class="team">
+
+          ${
+            home.logo
+              ? `
+                <img
+                  src="${escapeHTML(home.logo)}"
+                  alt=""
+                >
+              `
+              : ""
+          }
+
+          ${escapeHTML(home.name)}
+
+        </div>
+
+
+        <div class="score">
+
+          ${marcador}
+
+          <div class="status ${tipo}">
+
+            ${escapeHTML(estado)}
+
+          </div>
+
+        </div>
+
+
+        <div class="team">
+
+          ${
+            away.logo
+              ? `
+                <img
+                  src="${escapeHTML(away.logo)}"
+                  alt=""
+                >
+              `
+              : ""
+          }
+
+          ${escapeHTML(away.name)}
+
+        </div>
+
+
+      </div>
+
+    `;
+
+
+    return card;
 
   }
 
 
-  /*
-   * MOSTRAR REPRODUCTOR
-   */
-
-  function reproducirVideo(
-    embed,
-    titulo
-  ) {
-
-    const box =
-      document.getElementById(
-        "videoBox"
-      );
-
-    const player =
-      document.getElementById(
-        "videoPlayer"
-      );
-
-    const title =
-      document.getElementById(
-        "videoTitle"
-      );
-
-    title.textContent =
-      "▶️ " + titulo;
-
-    player.innerHTML =
-      embed;
-
-    box.style.display =
-      "block";
-
-    box.scrollIntoView({
-      behavior: "smooth"
-    });
-
-  }
-
-
-  /*
-   * ESTADOS EN VIVO
-   */
-
-  function esEnVivo(status) {
-
-    return [
-      "1H",
-      "2H",
-      "HT",
-      "ET",
-      "BT",
-      "P",
-      "SUSP",
-      "INT",
-      "LIVE"
-    ].includes(status);
-
-  }
-
-
-  /*
-   * NORMALIZAR NOMBRES
-   */
-
-  function normalizar(texto) {
-
-    return String(texto)
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        ""
-      )
-      .replace(
-        /[^a-z0-9]/g,
-        ""
-      );
-
-  }
-
-
-  /*
-   * SEGURIDAD BÁSICA PARA TEXTO
-   */
+  /* =========================
+     SEGURIDAD
+  ========================= */
 
   function escapeHTML(texto) {
 
     return String(texto)
+
       .replace(/&/g, "&amp;")
+
       .replace(/</g, "&lt;")
+
       .replace(/>/g, "&gt;")
+
       .replace(/"/g, "&quot;")
+
       .replace(/'/g, "&#039;");
 
   }
 
 
-  /*
-   * INICIAR
-   */
+  /* =========================
+     INICIAR
+  ========================= */
 
   cargarPartidos();
 
-</script>
 
-</body>
+  /* =========================
+     ACTUALIZAR CADA 30 SEGUNDOS
+  ========================= */
+
+  setInterval(
+    cargarPartidos,
+    30000
+  );
+
+</script></body>
 </html>
