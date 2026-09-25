@@ -1,388 +1,478 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yoger Atencio SPORT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOGER ATENCIO SPORT</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#08110d;
-  color:white;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #07110b;
+      color: white;
+    }
 
-header{
-  background:#0d1f16;
-  padding:18px 12px;
-  text-align:center;
-  border-bottom:2px solid #19d66b;
-}
+    header {
+      background: #0b1f12;
+      padding: 18px 15px;
+      text-align: center;
+      border-bottom: 2px solid #16c763;
+    }
 
-h1{margin:0;font-size:24px}
+    header h1 {
+      margin: 0;
+      font-size: 23px;
+    }
 
-.subtitle{
-  color:#19d66b;
-  font-weight:bold;
-  margin-top:6px;
-}
+    header p {
+      margin: 7px 0 0;
+      color: #16c763;
+      font-weight: bold;
+    }
 
-main{
-  max-width:900px;
-  margin:auto;
-  padding:16px;
-}
+    .container {
+      max-width: 700px;
+      margin: auto;
+      padding: 15px;
+    }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px;
-}
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
 
-h2{margin:0;font-size:20px}
+    .top h2 {
+      margin: 0;
+      font-size: 20px;
+    }
 
-button{
-  border:0;
-  border-radius:8px;
-  padding:11px 14px;
-  font-weight:bold;
-  cursor:pointer;
-}
+    .refresh {
+      background: #16c763;
+      color: #001b09;
+      border: 0;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.refresh{
-  background:#19d66b;
-  color:#031108;
-}
+    .match {
+      background: #102017;
+      border: 1px solid #1e4930;
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
 
-.match{
-  background:#102019;
-  border:1px solid #1d3a2a;
-  border-radius:12px;
-  padding:14px;
-  margin-bottom:12px;
-}
+    .league {
+      color: #8de9ae;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
 
-.league{
-  color:#19d66b;
-  font-size:13px;
-  font-weight:bold;
-  margin-bottom:12px;
-}
+    .teams {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: center;
+    }
 
-.teams{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  text-align:center;
-  gap:8px;
-}
+    .team {
+      width: 40%;
+      font-weight: bold;
+    }
 
-.team img{
-  width:45px;
-  height:45px;
-  object-fit:contain;
-}
+    .team img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 7px;
+    }
 
-.team-name{
-  font-weight:bold;
-  margin-top:6px;
-}
+    .score {
+      font-size: 22px;
+      font-weight: bold;
+      min-width: 55px;
+    }
 
-.vs{
-  color:#aaa;
-  font-weight:bold;
-}
+    .status {
+      color: #16c763;
+      font-size: 13px;
+      margin-top: 5px;
+    }
 
-.score{
-  font-size:21px;
-  margin-top:6px;
-}
+    .live {
+      color: #ff3b30;
+      font-weight: bold;
+    }
 
-.live{
-  display:inline-block;
-  background:#d60000;
-  padding:5px 8px;
-  border-radius:6px;
-  font-size:12px;
-  font-weight:bold;
-}
+    .watch {
+      width: 100%;
+      margin-top: 15px;
+      padding: 13px;
+      border: 0;
+      border-radius: 9px;
+      background: #16c763;
+      color: #001b09;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.match-time{
-  text-align:center;
-  margin-top:12px;
-  color:#ccc;
-}
+    .watch.disabled {
+      background: #34433a;
+      color: #aeb8b1;
+    }
 
-.watch{
-  display:block;
-  width:100%;
-  margin-top:14px;
-  background:#19d66b;
-  color:#031108;
-  font-size:15px;
-}
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
 
-#status{
-  color:#aaa;
-  font-size:14px;
-  margin-bottom:12px;
-}
+    .modal-box {
+      width: 100%;
+      max-width: 400px;
+      background: #102017;
+      border: 1px solid #16c763;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+    }
 
-.empty{
-  background:#102019;
-  padding:20px;
-  border-radius:12px;
-  text-align:center;
-  color:#aaa;
-}
+    .modal-box h3 {
+      margin-top: 0;
+    }
 
-.notice{
-  display:none;
-  margin-top:10px;
-  padding:10px;
-  background:#151515;
-  border-radius:8px;
-  color:#bbb;
-  font-size:13px;
-  text-align:center;
-}
-</style>
+    .option {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .netcom {
+      background: #16c763;
+      color: #001b09;
+    }
+
+    .official {
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .close {
+      background: #333;
+      color: white;
+    }
+
+    .loading,
+    .empty,
+    .error {
+      text-align: center;
+      padding: 30px 10px;
+      color: #b8c4bc;
+    }
+
+    .error {
+      color: #ff7b72;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-<h1>⚽ YOGER ATENCIO SPORT</h1>
-<div class="subtitle">🔴 FÚTBOL EN VIVO</div>
+  <h1>⚽ YOGER ATENCIO SPORT</h1>
+  <p>🔴 FÚTBOL EN VIVO</p>
 </header>
 
-<main>
+<div class="container">
 
-<div class="topbar">
-<h2>📺 Partidos de hoy</h2>
-<button class="refresh" onclick="loadMatches()">🔄 Actualizar</button>
+  <div class="top">
+    <h2>📺 Partidos de hoy</h2>
+    <button class="refresh" onclick="cargarPartidos()">↻ Actualizar</button>
+  </div>
+
+  <div id="matches">
+    <div class="loading">Cargando partidos...</div>
+  </div>
+
 </div>
 
-<div id="status">Cargando partidos...</div>
-<div id="matches"></div>
+<!-- VENTANA DE OPCIONES -->
+<div class="modal" id="watchModal">
+  <div class="modal-box">
 
-</main>
+    <h3>📺 Ver partido</h3>
+
+    <p id="selectedMatch"></p>
+
+    <button class="option netcom" onclick="abrirNetcom()">
+      📺 VER EN NETCOM TV
+    </button>
+
+    <button class="option official" onclick="buscarOficial()">
+      🌐 BUSCAR TRANSMISIÓN OFICIAL
+    </button>
+
+    <button class="option close" onclick="cerrarModal()">
+      ✕ Cerrar
+    </button>
+
+  </div>
+</div>
 
 <script>
 
-const liveStatuses = new Set([
-"1H","2H","HT","ET","BT","P","SUSP","INT","LIVE"
-]);
+  let partidoSeleccionado = null;
 
-function escapeHtml(value){
-return String(value ?? "").replace(/[&<>"']/g,char=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[char]));
-}
+  async function cargarPartidos() {
 
-function formatTime(dateString){
-const d=new Date(dateString);
+    const contenedor = document.getElementById("matches");
 
-return d.toLocaleString("es-ES",{
-day:"2-digit",
-month:"2-digit",
-hour:"2-digit",
-minute:"2-digit"
-});
-}
+    contenedor.innerHTML =
+      '<div class="loading">⏳ Cargando partidos...</div>';
 
-function watchMatch(home,away){
+    try {
 
-const query=encodeURIComponent(
-home+" vs "+away+" transmisión oficial"
-);
+      const respuesta = await fetch("/api/football");
 
-window.open(
-"https://www.google.com/search?q="+query,
-"_blank"
-);
+      if (!respuesta.ok) {
+        throw new Error("Error API");
+      }
 
-}
+      const data = await respuesta.json();
 
-async function loadMatches(){
+      if (!data.response || data.response.length === 0) {
+        contenedor.innerHTML =
+          '<div class="empty">No hay partidos disponibles.</div>';
+        return;
+      }
 
-const status=document.getElementById("status");
-const container=document.getElementById("matches");
+      let partidos = data.response;
 
-status.textContent="Cargando partidos...";
+      // Partidos en vivo primero
+      partidos.sort((a, b) => {
 
-try{
+        const liveA = esEnVivo(a.fixture.status.short) ? 1 : 0;
+        const liveB = esEnVivo(b.fixture.status.short) ? 1 : 0;
 
-const res=await fetch("/api/football",{
-cache:"no-store"
-});
+        return liveB - liveA;
 
-const data=await res.json();
+      });
 
-if(!res.ok || data.errors?.token){
-throw new Error(
-data.errors?.token || "Error de la API"
-);
-}
+      contenedor.innerHTML = "";
 
-const matches=Array.isArray(data.response)
-?data.response
-:[];
+      partidos.forEach(partido => {
 
-matches.sort((a,b)=>{
+        const fixture = partido.fixture;
+        const home = partido.teams.home;
+        const away = partido.teams.away;
+        const league = partido.league;
 
-const aLive=liveStatuses.has(
-a.fixture?.status?.short
-);
+        const enVivo = esEnVivo(fixture.status.short);
 
-const bLive=liveStatuses.has(
-b.fixture?.status?.short
-);
+        let marcador = "";
 
-if(aLive!==bLive){
-return bLive-aLive;
-}
+        if (
+          fixture.status.short === "NS"
+        ) {
 
-return new Date(a.fixture.date)-
-new Date(b.fixture.date);
+          const hora = new Date(
+            fixture.date
+          ).toLocaleTimeString(
+            "es-VE",
+            {
+              hour: "2-digit",
+              minute: "2-digit"
+            }
+          );
 
-});
+          marcador = hora;
 
-if(!matches.length){
+        } else {
 
-container.innerHTML=
-'<div class="empty">No hay partidos para hoy.</div>';
+          marcador =
+            `${partido.goals.home ?? 0} - ${partido.goals.away ?? 0}`;
 
-status.textContent="0 partidos encontrados";
+        }
 
-return;
-}
+        let estado = fixture.status.long || "";
 
-container.innerHTML=matches.map(m=>{
+        if (enVivo) {
 
-const f=m.fixture||{};
-const l=m.league||{};
-const h=m.teams?.home||{};
-const a=m.teams?.away||{};
+          estado =
+            `🔴 EN VIVO ${fixture.status.elapsed ? fixture.status.elapsed + "'" : ""}`;
 
-const hs=m.goals?.home;
-const as=m.goals?.away;
+        }
 
-const live=liveStatuses.has(
-f.status?.short
-);
+        const card = document.createElement("div");
 
-return `
+        card.className = "match";
 
-<div class="match">
+        card.innerHTML = `
 
-<div class="league">
-${escapeHtml(l.name)}
-·
-${escapeHtml(l.country)}
-</div>
+          <div class="league">
+            ${league.name}
+          </div>
 
-<div class="teams">
+          <div class="teams">
 
-<div class="team">
+            <div class="team">
+              ${
+                home.logo
+                ? `<img src="${home.logo}" alt="">`
+                : ""
+              }
+              ${home.name}
+            </div>
 
-<img
-src="${escapeHtml(h.logo||"")}"
-alt=""
->
+            <div class="score">
+              ${marcador}
+              <div class="status ${enVivo ? "live" : ""}">
+                ${estado}
+              </div>
+            </div>
 
-<div class="team-name">
-${escapeHtml(h.name)}
-</div>
+            <div class="team">
+              ${
+                away.logo
+                ? `<img src="${away.logo}" alt="">`
+                : ""
+              }
+              ${away.name}
+            </div>
 
-</div>
+          </div>
 
-<div class="vs">
+          <button
+            class="watch"
+            onclick='abrirOpciones(${JSON.stringify(
+              home.name + " vs " + away.name
+            )})'
+          >
+            ▶️ VER EN VIVO
+          </button>
 
-${
-live
-?
-`
-<span class="live">🔴 EN VIVO</span>
+        `;
 
-<div class="score">
-${hs??0} - ${as??0}
-</div>
-`
-:
-"VS"
-}
+        contenedor.appendChild(card);
 
-</div>
+      });
 
-<div class="team">
+    } catch (error) {
 
-<img
-src="${escapeHtml(a.logo||"")}"
-alt=""
->
+      console.error(error);
 
-<div class="team-name">
-${escapeHtml(a.name)}
-</div>
+      contenedor.innerHTML = `
+        <div class="error">
+          ❌ No se pudieron cargar los partidos.
+          <br><br>
+          Pulsa "Actualizar" para intentar nuevamente.
+        </div>
+      `;
 
-</div>
+    }
 
-</div>
+  }
 
-<div class="match-time">
+  function esEnVivo(status) {
 
-${
-live
-?
-escapeHtml(
-f.status?.long||"En vivo"
-)
-:
-"🕐 "+formatTime(f.date)
-}
+    return [
+      "1H",
+      "2H",
+      "HT",
+      "ET",
+      "BT",
+      "P",
+      "SUSP",
+      "INT",
+      "LIVE"
+    ].includes(status);
 
-</div>
+  }
 
-<button
-class="watch"
-onclick="watchMatch(
-'${escapeHtml(h.name)}',
-'${escapeHtml(a.name)}'
-)"
->
-▶️ VER EN VIVO
-</button>
+  function abrirOpciones(partido) {
 
-</div>
+    partidoSeleccionado = partido;
 
-`;
+    document.getElementById("selectedMatch").textContent =
+      partido;
 
-}).join("");
+    document.getElementById("watchModal").style.display =
+      "flex";
 
-status.textContent=
-`${matches.length} partidos encontrados`;
+  }
 
-}catch(error){
+  function cerrarModal() {
 
-container.innerHTML=
-'<div class="empty">No se pudieron cargar los partidos.</div>';
+    document.getElementById("watchModal").style.display =
+      "none";
 
-status.textContent=error.message;
+  }
 
-}
+  function abrirNetcom() {
 
-}
+    /*
+      Intentamos abrir Netcom TV.
 
-loadMatches();
+      Si Android reconoce un enlace de la aplicación,
+      puede abrirla automáticamente.
+
+      Si no lo reconoce, abrimos la web de Netcom.
+    */
+
+    window.location.href =
+      "netcomtv://";
+
+    setTimeout(() => {
+
+      window.open(
+        "https://www.google.com/search?q=Netcom+TV+Venezuela",
+        "_blank"
+      );
+
+    }, 1200);
+
+  }
+
+  function buscarOficial() {
+
+    if (!partidoSeleccionado) return;
+
+    const consulta =
+      partidoSeleccionado +
+      " transmisión oficial en vivo";
+
+    const url =
+      "https://www.google.com/search?q=" +
+      encodeURIComponent(consulta);
+
+    window.open(url, "_blank");
+
+  }
+
+  // Cargar automáticamente
+  cargarPartidos();
 
 </script>
 
