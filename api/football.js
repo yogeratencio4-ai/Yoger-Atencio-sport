@@ -1,125 +1,235 @@
 export default async function handler(request, response) {
+
   try {
+
     const API_KEY = process.env.API_FOOTBALL_KEY;
 
     if (!API_KEY) {
+
       return response.status(500).json({
+        success: false,
         error: "Falta configurar API_FOOTBALL_KEY en Vercel"
       });
+
     }
 
+
     const headers = {
-      "x-apisports-key": API_KEY
+      "x-apisports-key": API_KEY,
+      "Accept": "application/json"
     };
+
 
     const ahora = new Date();
 
-    const hoy = ahora.toISOString().split("T")[0];
+    const hoy =
+      ahora.toISOString().split("T")[0];
 
-    const mananaFecha = new Date(ahora);
-    mananaFecha.setUTCDate(mananaFecha.getUTCDate() + 1);
-    const manana = mananaFecha.toISOString().split("T")[0];
 
-    // ============================================
-    // PARTIDOS EN VIVO
-    // ============================================
+    const mananaFecha =
+      new Date(ahora);
 
-    const liveResponse = await fetch(
-      "https://v3.football.api-sports.io/fixtures?live=all",
-      {
-        headers
-      }
+    mananaFecha.setUTCDate(
+      mananaFecha.getUTCDate() + 1
     );
 
-    const liveData = await liveResponse.json();
+    const manana =
+      mananaFecha.toISOString().split("T")[0];
 
-    if (!liveResponse.ok) {
-      return response.status(liveResponse.status).json({
-        error: "Error obteniendo partidos en vivo",
-        detalles: liveData
-      });
+
+    /* ==========================================
+       FUNCION PARA CONSULTAR API-FOOTBALL
+    ========================================== */
+
+    async function consultar(url) {
+
+      const r = await fetch(
+        url,
+        {
+          method: "GET",
+          headers
+        }
+      );
+
+
+      const data =
+        await r.json();
+
+
+      return {
+        ok: r.ok,
+        status: r.status,
+        data
+      };
+
     }
 
-    const enVivo = liveData.response || [];
 
-    // ============================================
-    // PARTIDOS DE HOY
-    // ============================================
+    /* ==========================================
+       PARTIDOS EN VIVO
+    ========================================== */
 
-    const hoyResponse = await fetch(
-      `https://v3.football.api-sports.io/fixtures?date=${hoy}`,
-      {
-        headers
-      }
-    );
+    const live =
+      await consultar(
+        "https://v3.football.api-sports.io/fixtures?live=all"
+      );
 
-    const hoyData = await hoyResponse.json();
 
-    if (!hoyResponse.ok) {
-      return response.status(hoyResponse.status).json({
-        error: "Error obteniendo partidos de hoy",
-        detalles: hoyData
+    if (!live.ok) {
+
+      return response.status(500).json({
+
+        success: false,
+
+        error:
+          "API-Football rechazó la consulta de partidos en vivo",
+
+        status:
+          live.status,
+
+        detalles:
+          live.data
+
       });
+
     }
 
-    const partidosHoy = hoyData.response || [];
 
-    // ============================================
-    // PARTIDOS DE MAÑANA
-    // ============================================
+    const enVivo =
+      live.data?.response || [];
 
-    const mananaResponse = await fetch(
-      `https://v3.football.api-sports.io/fixtures?date=${manana}`,
-      {
-        headers
-      }
-    );
 
-    const mananaData = await mananaResponse.json();
+    /* ==========================================
+       PARTIDOS DE HOY
+    ========================================== */
 
-    if (!mananaResponse.ok) {
-      return response.status(mananaResponse.status).json({
-        error: "Error obteniendo partidos de mañana",
-        detalles: mananaData
+    const hoyResultado =
+      await consultar(
+        `https://v3.football.api-sports.io/fixtures?date=${hoy}`
+      );
+
+
+    if (!hoyResultado.ok) {
+
+      return response.status(500).json({
+
+        success: false,
+
+        error:
+          "API-Football rechazó la consulta de partidos de hoy",
+
+        status:
+          hoyResultado.status,
+
+        detalles:
+          hoyResultado.data
+
       });
+
     }
 
-    const partidosManana = mananaData.response || [];
 
-    // ============================================
-    // ELIMINAR DUPLICADOS
-    // ============================================
+    const partidosHoy =
+      hoyResultado.data?.response || [];
 
-    const mapa = new Map();
+
+    /* ==========================================
+       PARTIDOS DE MAÑANA
+    ========================================== */
+
+    const mananaResultado =
+      await consultar(
+        `https://v3.football.api-sports.io/fixtures?date=${manana}`
+      );
+
+
+    if (!mananaResultado.ok) {
+
+      return response.status(500).json({
+
+        success: false,
+
+        error:
+          "API-Football rechazó la consulta de mañana",
+
+        status:
+          mananaResultado.status,
+
+        detalles:
+          mananaResultado.data
+
+      });
+
+    }
+
+
+    const partidosManana =
+      mananaResultado.data?.response || [];
+
+
+    /* ==========================================
+       ELIMINAR DUPLICADOS
+    ========================================== */
+
+    const mapa =
+      new Map();
+
 
     [
       ...enVivo,
       ...partidosHoy,
       ...partidosManana
-    ].forEach((partido) => {
-      if (partido && partido.fixture && partido.fixture.id) {
-        mapa.set(partido.fixture.id, partido);
+    ].forEach(
+      partido => {
+
+        const id =
+          partido?.fixture?.id;
+
+        if (id) {
+
+          mapa.set(
+            id,
+            partido
+          );
+
+        }
+
       }
-    });
+    );
 
-    const partidos = Array.from(mapa.values());
 
-    // ============================================
-    // RESPUESTA
-    // ============================================
+    const partidos =
+      Array.from(
+        mapa.values()
+      );
+
+
+    /* ==========================================
+       INFORMACIÓN DE API
+    ========================================== */
 
     return response.status(200).json({
+
       success: true,
 
-      fechaActual: ahora.toISOString(),
+      fechaActual:
+        ahora.toISOString(),
 
       hoy,
+
       manana,
 
-      cantidadEnVivo: enVivo.length,
-      cantidadHoy: partidosHoy.length,
-      cantidadManana: partidosManana.length,
-      cantidadTotal: partidos.length,
+      cantidadEnVivo:
+        enVivo.length,
+
+      cantidadHoy:
+        partidosHoy.length,
+
+      cantidadManana:
+        partidosManana.length,
+
+      cantidadTotal:
+        partidos.length,
 
       enVivo,
 
@@ -127,16 +237,55 @@ export default async function handler(request, response) {
 
       partidosManana,
 
-      partidos
+      partidos,
+
+      /* INFORMACIÓN PARA DEPURAR */
+
+      api: {
+
+        liveErrors:
+          live.data?.errors || {},
+
+        hoyErrors:
+          hoyResultado.data?.errors || {},
+
+        mananaErrors:
+          mananaResultado.data?.errors || {},
+
+        liveResults:
+          live.data?.results ?? null,
+
+        hoyResults:
+          hoyResultado.data?.results ?? null,
+
+        mananaResults:
+          mananaResultado.data?.results ?? null
+
+      }
+
     });
+
 
   } catch (error) {
-    console.error("ERROR FOOTBALL API:", error);
+
+    console.error(
+      "ERROR FOOTBALL API:",
+      error
+    );
+
 
     return response.status(500).json({
+
       success: false,
-      error: "Error interno del servidor",
-      detalles: error.message
+
+      error:
+        "Error interno del servidor",
+
+      detalles:
+        error?.message || String(error)
+
     });
+
   }
+
 }
