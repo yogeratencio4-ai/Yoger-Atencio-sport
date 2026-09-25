@@ -3,140 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Yoger Atencio SPORT</title>
 
 <style>
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#08110d;
+  color:white;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #08110d;
-  color: white;
+header{
+  background:#0d1f16;
+  padding:18px 12px;
+  text-align:center;
+  border-bottom:2px solid #19d66b;
 }
 
-header {
-  background: #0d1f16;
-  padding: 18px 12px;
-  text-align: center;
-  border-bottom: 2px solid #19d66b;
+h1{margin:0;font-size:24px}
+
+.subtitle{
+  color:#19d66b;
+  font-weight:bold;
+  margin-top:6px;
 }
 
-h1 {
-  margin: 0;
-  font-size: 24px;
+main{
+  max-width:900px;
+  margin:auto;
+  padding:16px;
 }
 
-.subtitle {
-  color: #19d66b;
-  font-weight: bold;
-  margin-top: 6px;
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
 }
 
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 16px;
+h2{margin:0;font-size:20px}
+
+button{
+  border:0;
+  border-radius:8px;
+  padding:11px 14px;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
+.refresh{
+  background:#19d66b;
+  color:#031108;
 }
 
-h2 {
-  margin: 0;
-  font-size: 20px;
+.match{
+  background:#102019;
+  border:1px solid #1d3a2a;
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:12px;
 }
 
-button {
-  background: #19d66b;
-  color: #031108;
-  border: 0;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-weight: bold;
+.league{
+  color:#19d66b;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:12px;
 }
 
-#status {
-  color: #aaa;
-  font-size: 14px;
-  margin-bottom: 12px;
+.teams{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  text-align:center;
+  gap:8px;
 }
 
-.match {
-  background: #102019;
-  border: 1px solid #1d3a2a;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 12px;
+.team img{
+  width:45px;
+  height:45px;
+  object-fit:contain;
 }
 
-.league {
-  font-size: 13px;
-  color: #19d66b;
-  font-weight: bold;
-  margin-bottom: 10px;
+.team-name{
+  font-weight:bold;
+  margin-top:6px;
 }
 
-.teams {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
+.vs{
+  color:#aaa;
+  font-weight:bold;
 }
 
-.team img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
+.score{
+  font-size:21px;
+  margin-top:6px;
 }
 
-.team-name {
-  font-weight: bold;
-  margin-top: 5px;
+.live{
+  display:inline-block;
+  background:#d60000;
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:bold;
 }
 
-.vs {
-  color: #aaa;
-  font-weight: bold;
+.match-time{
+  text-align:center;
+  margin-top:12px;
+  color:#ccc;
 }
 
-.time {
-  margin-top: 12px;
-  text-align: center;
-  color: #ddd;
+.watch{
+  display:block;
+  width:100%;
+  margin-top:14px;
+  background:#19d66b;
+  color:#031108;
+  font-size:15px;
 }
 
-.live {
-  display: inline-block;
-  background: #d60000;
-  color: white;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: bold;
+#status{
+  color:#aaa;
+  font-size:14px;
+  margin-bottom:12px;
 }
 
-.score {
-  font-size: 20px;
-  font-weight: 800;
-  margin-top: 8px;
+.empty{
+  background:#102019;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  color:#aaa;
 }
 
-.empty {
-  background: #102019;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  color: #aaa;
+.notice{
+  display:none;
+  margin-top:10px;
+  padding:10px;
+  background:#151515;
+  border-radius:8px;
+  color:#bbb;
+  font-size:13px;
+  text-align:center;
 }
 </style>
 </head>
@@ -144,226 +156,229 @@ button {
 <body>
 
 <header>
-  <h1>⚽ YOGER ATENCIO SPORT</h1>
-  <div class="subtitle">🔴 FÚTBOL EN VIVO</div>
+<h1>⚽ YOGER ATENCIO SPORT</h1>
+<div class="subtitle">🔴 FÚTBOL EN VIVO</div>
 </header>
 
 <main>
 
-  <div class="topbar">
-    <h2>📺 Partidos</h2>
+<div class="topbar">
+<h2>📺 Partidos de hoy</h2>
+<button class="refresh" onclick="loadMatches()">🔄 Actualizar</button>
+</div>
 
-    <button onclick="loadMatches()">
-      🔄 Actualizar
-    </button>
-  </div>
-
-  <div id="status">
-    Cargando partidos...
-  </div>
-
-  <div id="matches"></div>
+<div id="status">Cargando partidos...</div>
+<div id="matches"></div>
 
 </main>
 
 <script>
 
 const liveStatuses = new Set([
-  "1H",
-  "2H",
-  "HT",
-  "ET",
-  "BT",
-  "P",
-  "SUSP",
-  "INT",
-  "LIVE"
+"1H","2H","HT","ET","BT","P","SUSP","INT","LIVE"
 ]);
 
-function escapeHtml(value) {
+function escapeHtml(value){
+return String(value ?? "").replace(/[&<>"']/g,char=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[char]));
+}
 
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  }[char]));
+function formatTime(dateString){
+const d=new Date(dateString);
+
+return d.toLocaleString("es-ES",{
+day:"2-digit",
+month:"2-digit",
+hour:"2-digit",
+minute:"2-digit"
+});
+}
+
+function watchMatch(home,away){
+
+const query=encodeURIComponent(
+home+" vs "+away+" transmisión oficial"
+);
+
+window.open(
+"https://www.google.com/search?q="+query,
+"_blank"
+);
 
 }
 
-function formatTime(dateString) {
+async function loadMatches(){
 
-  const d = new Date(dateString);
+const status=document.getElementById("status");
+const container=document.getElementById("matches");
 
-  return d.toLocaleString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+status.textContent="Cargando partidos...";
 
+try{
+
+const res=await fetch("/api/football",{
+cache:"no-store"
+});
+
+const data=await res.json();
+
+if(!res.ok || data.errors?.token){
+throw new Error(
+data.errors?.token || "Error de la API"
+);
 }
 
-async function loadMatches() {
+const matches=Array.isArray(data.response)
+?data.response
+:[];
 
-  const status = document.getElementById("status");
-  const container = document.getElementById("matches");
+matches.sort((a,b)=>{
 
-  status.textContent = "Cargando partidos...";
+const aLive=liveStatuses.has(
+a.fixture?.status?.short
+);
 
-  try {
+const bLive=liveStatuses.has(
+b.fixture?.status?.short
+);
 
-    const res = await fetch("/api/football", {
-      cache: "no-store"
-    });
+if(aLive!==bLive){
+return bLive-aLive;
+}
 
-    const data = await res.json();
+return new Date(a.fixture.date)-
+new Date(b.fixture.date);
 
-    if (!res.ok || data.errors?.token) {
-      throw new Error(
-        data.errors?.token || "Error de la API"
-      );
-    }
+});
 
-    const matches = Array.isArray(data.response)
-      ? data.response
-      : [];
+if(!matches.length){
 
-    matches.sort((a, b) => {
+container.innerHTML=
+'<div class="empty">No hay partidos para hoy.</div>';
 
-      const aLive = liveStatuses.has(
-        a.fixture?.status?.short
-      );
+status.textContent="0 partidos encontrados";
 
-      const bLive = liveStatuses.has(
-        b.fixture?.status?.short
-      );
+return;
+}
 
-      if (aLive !== bLive) {
-        return bLive - aLive;
-      }
+container.innerHTML=matches.map(m=>{
 
-      return new Date(a.fixture.date)
-        - new Date(b.fixture.date);
+const f=m.fixture||{};
+const l=m.league||{};
+const h=m.teams?.home||{};
+const a=m.teams?.away||{};
 
-    });
+const hs=m.goals?.home;
+const as=m.goals?.away;
 
-    if (!matches.length) {
+const live=liveStatuses.has(
+f.status?.short
+);
 
-      container.innerHTML =
-        '<div class="empty">No hay partidos para hoy.</div>';
+return `
 
-      status.textContent =
-        "0 partidos encontrados";
+<div class="match">
 
-      return;
-    }
+<div class="league">
+${escapeHtml(l.name)}
+·
+${escapeHtml(l.country)}
+</div>
 
-    container.innerHTML = matches.map(m => {
+<div class="teams">
 
-      const f = m.fixture || {};
-      const l = m.league || {};
-      const h = m.teams?.home || {};
-      const a = m.teams?.away || {};
+<div class="team">
 
-      const hs = m.goals?.home;
-      const as = m.goals?.away;
+<img
+src="${escapeHtml(h.logo||"")}"
+alt=""
+>
 
-      const live = liveStatuses.has(
-        f.status?.short
-      );
+<div class="team-name">
+${escapeHtml(h.name)}
+</div>
 
-      return `
+</div>
 
-        <div class="match">
+<div class="vs">
 
-          <div class="league">
-            ${escapeHtml(l.name)}
-            ·
-            ${escapeHtml(l.country)}
-          </div>
+${
+live
+?
+`
+<span class="live">🔴 EN VIVO</span>
 
-          <div class="teams">
+<div class="score">
+${hs??0} - ${as??0}
+</div>
+`
+:
+"VS"
+}
 
-            <div class="team">
+</div>
 
-              <img
-                src="${escapeHtml(h.logo || "")}"
-                alt=""
-              >
+<div class="team">
 
-              <div class="team-name">
-                ${escapeHtml(h.name)}
-              </div>
+<img
+src="${escapeHtml(a.logo||"")}"
+alt=""
+>
 
-            </div>
+<div class="team-name">
+${escapeHtml(a.name)}
+</div>
 
-            <div class="vs">
+</div>
 
-              ${
-                live
-                ? `
-                  <span class="live">
-                    🔴 EN VIVO
-                  </span>
+</div>
 
-                  <div class="score">
-                    ${hs ?? 0} - ${as ?? 0}
-                  </div>
-                `
-                : "VS"
-              }
+<div class="match-time">
 
-            </div>
+${
+live
+?
+escapeHtml(
+f.status?.long||"En vivo"
+)
+:
+"🕐 "+formatTime(f.date)
+}
 
-            <div class="team">
+</div>
 
-              <img
-                src="${escapeHtml(a.logo || "")}"
-                alt=""
-              >
+<button
+class="watch"
+onclick="watchMatch(
+'${escapeHtml(h.name)}',
+'${escapeHtml(a.name)}'
+)"
+>
+▶️ VER EN VIVO
+</button>
 
-              <div class="team-name">
-                ${escapeHtml(a.name)}
-              </div>
+</div>
 
-            </div>
+`;
 
-          </div>
+}).join("");
 
-          <div class="time">
+status.textContent=
+`${matches.length} partidos encontrados`;
 
-            ${
-              live
-              ? escapeHtml(
-                  f.status?.long || "En vivo"
-                )
-              : "🕐 " + formatTime(f.date)
-            }
+}catch(error){
 
-          </div>
+container.innerHTML=
+'<div class="empty">No se pudieron cargar los partidos.</div>';
 
-        </div>
+status.textContent=error.message;
 
-      `;
-
-    }).join("");
-
-    status.textContent =
-      `${matches.length} partidos encontrados`;
-
-  } catch (error) {
-
-    container.innerHTML =
-      `<div class="empty">
-        No se pudieron cargar los partidos.
-      </div>`;
-
-    status.textContent =
-      error.message;
-
-  }
+}
 
 }
 
