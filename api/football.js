@@ -12,7 +12,6 @@ export default async function handler(request, response) {
       "x-apisports-key": API_KEY
     };
 
-    // Fecha actual
     const ahora = new Date();
 
     const hoy = ahora.toISOString().split("T")[0];
@@ -21,14 +20,10 @@ export default async function handler(request, response) {
     mananaFecha.setUTCDate(mananaFecha.getUTCDate() + 1);
     const manana = mananaFecha.toISOString().split("T")[0];
 
-    /*
-     * ==========================================================
-     * 1. PARTIDOS EN VIVO
-     * ==========================================================
-     *
-     * live=all obtiene TODOS los partidos en vivo
-     * de todas las ligas disponibles.
-     */
+    // ============================================
+    // PARTIDOS EN VIVO
+    // ============================================
+
     const liveResponse = await fetch(
       "https://v3.football.api-sports.io/fixtures?live=all",
       {
@@ -47,9 +42,101 @@ export default async function handler(request, response) {
 
     const enVivo = liveData.response || [];
 
-    /*
-     * ==========================================================
-     * 2. PARTIDOS DE HOY Y MAÑANA
-     * ==========================================================
-     */
-    const fixturesResponse = await fetch
+    // ============================================
+    // PARTIDOS DE HOY
+    // ============================================
+
+    const hoyResponse = await fetch(
+      `https://v3.football.api-sports.io/fixtures?date=${hoy}`,
+      {
+        headers
+      }
+    );
+
+    const hoyData = await hoyResponse.json();
+
+    if (!hoyResponse.ok) {
+      return response.status(hoyResponse.status).json({
+        error: "Error obteniendo partidos de hoy",
+        detalles: hoyData
+      });
+    }
+
+    const partidosHoy = hoyData.response || [];
+
+    // ============================================
+    // PARTIDOS DE MAÑANA
+    // ============================================
+
+    const mananaResponse = await fetch(
+      `https://v3.football.api-sports.io/fixtures?date=${manana}`,
+      {
+        headers
+      }
+    );
+
+    const mananaData = await mananaResponse.json();
+
+    if (!mananaResponse.ok) {
+      return response.status(mananaResponse.status).json({
+        error: "Error obteniendo partidos de mañana",
+        detalles: mananaData
+      });
+    }
+
+    const partidosManana = mananaData.response || [];
+
+    // ============================================
+    // ELIMINAR DUPLICADOS
+    // ============================================
+
+    const mapa = new Map();
+
+    [
+      ...enVivo,
+      ...partidosHoy,
+      ...partidosManana
+    ].forEach((partido) => {
+      if (partido && partido.fixture && partido.fixture.id) {
+        mapa.set(partido.fixture.id, partido);
+      }
+    });
+
+    const partidos = Array.from(mapa.values());
+
+    // ============================================
+    // RESPUESTA
+    // ============================================
+
+    return response.status(200).json({
+      success: true,
+
+      fechaActual: ahora.toISOString(),
+
+      hoy,
+      manana,
+
+      cantidadEnVivo: enVivo.length,
+      cantidadHoy: partidosHoy.length,
+      cantidadManana: partidosManana.length,
+      cantidadTotal: partidos.length,
+
+      enVivo,
+
+      partidosHoy,
+
+      partidosManana,
+
+      partidos
+    });
+
+  } catch (error) {
+    console.error("ERROR FOOTBALL API:", error);
+
+    return response.status(500).json({
+      success: false,
+      error: "Error interno del servidor",
+      detalles: error.message
+    });
+  }
+}
