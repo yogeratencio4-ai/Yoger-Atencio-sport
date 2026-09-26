@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>YOGER ATENCIO SPORT</title>
 
 <style>
@@ -19,20 +20,46 @@ body{
 
 header{
   background:linear-gradient(135deg,#0b5d2a,#063b1b);
-  padding:20px 12px;
+  padding:18px 10px;
   text-align:center;
   border-bottom:2px solid #20c463;
 }
 
+.header-title{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
 header h1{
   margin:0;
+  font-size:24px;
+}
+
+.capibarber{
   font-size:25px;
+  white-space:nowrap;
 }
 
 header p{
-  margin:6px 0 0;
+  margin:7px 0 0;
   color:#b9ffd0;
   font-size:13px;
+  font-weight:bold;
+}
+
+.predicciones-logo{
+  margin-top:9px;
+  display:inline-block;
+  padding:7px 13px;
+  border-radius:20px;
+  background:#082512;
+  border:1px solid #31d96d;
+  color:#7dff9d;
+  font-size:13px;
+  font-weight:bold;
 }
 
 .tabs{
@@ -50,10 +77,11 @@ header p{
   border:1px solid #176d36;
   background:#0b2616;
   color:#fff;
-  padding:12px 5px;
+  padding:12px 4px;
   border-radius:9px;
   font-weight:bold;
   cursor:pointer;
+  font-size:12px;
 }
 
 .tab.active{
@@ -68,7 +96,7 @@ header p{
   background:#102519;
   border:1px solid #1b6334;
   text-align:center;
-  font-size:13px;
+  font-size:12px;
 }
 
 .container{
@@ -114,6 +142,26 @@ header p{
   font-size:17px;
   font-weight:bold;
   cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.country-arrow{
+  font-size:13px;
+  transition:transform .2s;
+}
+
+.country.closed .country-arrow{
+  transform:rotate(-90deg);
+}
+
+.country-content{
+  display:block;
+}
+
+.country.closed .country-content{
+  display:none;
 }
 
 .league{
@@ -136,11 +184,26 @@ header p{
 
 .league-name{
   font-weight:bold;
+  font-size:13px;
+}
+
+.league-right{
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
 .league-count{
   color:#9effb8;
-  font-size:12px;
+  font-size:11px;
+}
+
+.league-arrow{
+  font-size:11px;
+}
+
+.league.closed .matches{
+  display:none;
 }
 
 .matches{
@@ -159,6 +222,7 @@ header p{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:5px;
   font-size:11px;
   color:#9ad9ac;
   margin-bottom:8px;
@@ -167,6 +231,13 @@ header p{
 .live{
   color:#ff5555;
   font-weight:bold;
+}
+
+.match-date{
+  text-align:center;
+  color:#9effb8;
+  font-size:10px;
+  margin-bottom:8px;
 }
 
 .teams{
@@ -206,6 +277,10 @@ header p{
   color:#fff;
   font-weight:bold;
   cursor:pointer;
+}
+
+.pred-btn:disabled{
+  opacity:.7;
 }
 
 .prediction{
@@ -277,9 +352,25 @@ header p{
   color:#8fb39a;
 }
 
+.section-info{
+  margin:10px 0;
+  padding:9px;
+  background:#081b10;
+  border:1px solid #14552d;
+  border-radius:8px;
+  text-align:center;
+  color:#9effb8;
+  font-size:11px;
+}
+
 @media(max-width:500px){
+
   header h1{
-    font-size:22px;
+    font-size:21px;
+  }
+
+  .capibarber{
+    font-size:23px;
   }
 
   .teams{
@@ -289,6 +380,10 @@ header p{
   .team{
     font-size:12px;
   }
+
+  .league-name{
+    font-size:12px;
+  }
 }
 </style>
 </head>
@@ -296,14 +391,40 @@ header p{
 <body>
 
 <header>
-  <h1>⚽ YOGER ATENCIO SPORT</h1>
+
+  <div class="header-title">
+    <h1>⚽ YOGER ATENCIO SPORT</h1>
+    <span class="capibarber">💈🦫</span>
+  </div>
+
   <p>PARTIDOS DE FÚTBOL EN VIVO</p>
+
+  <div class="predicciones-logo">
+    🔮 PREDICCIONES CAPIBARBER
+  </div>
+
 </header>
 
 <div class="tabs">
-  <button class="tab active" id="tabLive" onclick="cambiarSeccion('live')">🔴 EN VIVO</button>
-  <button class="tab" id="tabToday" onclick="cambiarSeccion('today')">📅 HOY</button>
-  <button class="tab" id="tabNext" onclick="cambiarSeccion('next')">⏭️ PRÓXIMOS</button>
+
+  <button class="tab active"
+          id="tabLive"
+          onclick="cambiarSeccion('live')">
+    🔴 EN VIVO
+  </button>
+
+  <button class="tab"
+          id="tabToday"
+          onclick="cambiarSeccion('today')">
+    📅 HOY
+  </button>
+
+  <button class="tab"
+          id="tabNext"
+          onclick="cambiarSeccion('next')">
+    ⏭️ PRÓXIMOS
+  </button>
+
 </div>
 
 <div id="status" class="status">
@@ -311,38 +432,186 @@ header p{
 </div>
 
 <div class="container">
+
+  <div class="section-info">
+    🕐 Las horas y fechas se muestran automáticamente según la zona horaria del dispositivo.
+  </div>
+
   <div id="app">
+
     <div class="loading">
       ⚽ Cargando partidos...<br>
-      <span class="small">Conectando con YOGER ATENCIO SPORT</span>
+      <span class="small">
+        Conectando con YOGER ATENCIO SPORT
+      </span>
     </div>
+
   </div>
+
 </div>
 
 <script>
-const ligasPrediccion = [
+
+/* =========================================================
+   COMPETICIONES PERMITIDAS
+   ========================================================= */
+
+const competicionesPermitidas = [
+
+  /* ESPAÑA */
   "La Liga",
+  "LaLiga",
   "Copa del Rey",
-  "Premier League",
-  "Championship",
-  "League One",
-  "FA Cup",
-  "Serie A",
-  "Bundesliga",
-  "2. Bundesliga",
+  "Supercopa de España",
+
+  /* FRANCIA */
   "Ligue 1",
+  "Coupe de France",
+  "Trophée des Champions",
+
+  /* ALEMANIA */
+  "Bundesliga",
+  "DFB Pokal",
+  "DFB-Pokal",
+  "Super Cup",
+  "Supercup",
+
+  /* ITALIA */
+  "Serie A",
+  "Coppa Italia",
+  "Supercoppa Italiana",
+
+  /* INGLATERRA */
+  "Premier League",
+  "FA Cup",
+  "EFL Cup",
+  "League Cup",
+  "Community Shield",
+
+  /* NORUEGA */
+  "Eliteserien",
+  "NM Cup",
+  "Norwegian Cup",
+
+  /* DINAMARCA */
+  "Superliga",
+  "Danish Cup",
+  "DBU Pokalen",
+
+  /* BÉLGICA */
+  "Jupiler Pro League",
+  "Belgian Pro League",
+  "Cup",
+
+  /* SUIZA */
+  "Super League",
+  "Swiss Cup",
+
+  /* BULGARIA */
+  "First League",
+  "Bulgarian Cup",
+
+  /* ESCOCIA */
+  "Scottish Premiership",
+  "Scottish Cup",
+
+  /* MLS / USA */
+  "Major League Soccer",
+  "MLS",
+  "Leagues Cup",
+
+  /* BRASIL */
+  "Brasileirão Série A",
+  "Brasileirão",
+  "Serie A",
+  "Copa do Brasil",
+  "Supercopa do Brasil",
+
+  /* COLOMBIA */
+  "Primera A",
+  "Liga BetPlay",
+  "Copa Colombia",
+
+  /* UEFA */
   "UEFA Champions League",
   "UEFA Europa League",
   "UEFA Europa Conference League",
+
+  /* SELECCIONES */
+  "Copa América",
+  "Euro Championship",
+  "European Championship",
+  "World Cup",
+  "UEFA Nations League"
+
+];
+
+
+/* =========================================================
+   ORDEN DE COMPETICIONES
+   ========================================================= */
+
+const ordenCompeticiones = [
+
+  "Premier League",
+  "La Liga",
+  "Serie A",
+  "Bundesliga",
+  "Ligue 1",
+
+  "UEFA Champions League",
+  "UEFA Europa League",
+  "UEFA Europa Conference League",
+
+  "Brasileirão Série A",
   "Brasileirão",
-  "Copa Libertadores",
-  "Copa Sudamericana",
+  "Major League Soccer",
+  "MLS",
+
   "Scottish Premiership",
-  "Belgian Pro League",
+  "Jupiler Pro League",
   "Superliga",
   "Eliteserien",
-  "Super League"
+  "Super League",
+  "First League",
+
+  "Copa del Rey",
+  "FA Cup",
+  "EFL Cup",
+  "League Cup",
+  "DFB Pokal",
+  "DFB-Pokal",
+  "Coppa Italia",
+  "Coupe de France",
+
+  "Scottish Cup",
+  "Copa do Brasil",
+  "Copa Colombia",
+  "Danish Cup",
+  "Swiss Cup",
+  "Bulgarian Cup",
+  "NM Cup",
+  "Norwegian Cup",
+
+  "Supercopa de España",
+  "Supercup",
+  "Supercoppa Italiana",
+  "Community Shield",
+  "Trophée des Champions",
+  "Supercopa do Brasil",
+  "Leagues Cup",
+
+  "Copa América",
+  "European Championship",
+  "Euro Championship",
+  "World Cup",
+  "UEFA Nations League"
 ];
+
+
+/* =========================================================
+   DATOS
+   ========================================================= */
 
 let datos = {
   live: [],
@@ -353,8 +622,17 @@ let datos = {
 let seccionActual = "live";
 let cargando = false;
 
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+
 function escapeHTML(texto){
-  if(texto === null || texto === undefined) return "";
+
+  if(texto === null || texto === undefined){
+    return "";
+  }
+
   return String(texto)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
@@ -363,134 +641,357 @@ function escapeHTML(texto){
     .replace(/'/g,"&#039;");
 }
 
-function obtenerLiga(match){
-  return match?.league?.name || "Otras ligas";
+
+function normalizarTexto(texto){
+
+  return String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim();
+
 }
+
+
+function obtenerLiga(match){
+
+  return match?.league?.name || "Otras ligas";
+
+}
+
 
 function obtenerPais(match){
+
   return match?.league?.country || "Internacional";
+
 }
+
 
 function nombreEquipo(team){
+
   return team?.name || "Equipo";
+
 }
+
 
 function logoEquipo(team){
+
   return team?.logo || "";
+
 }
 
-function horaPartido(match){
+
+/* =========================================================
+   HORA Y FECHA LOCAL DEL USUARIO
+   ========================================================= */
+
+function fechaHoraLocal(match){
+
   const fecha = match?.fixture?.date;
 
-  if(!fecha) return "--:--";
+  if(!fecha){
+    return {
+      fecha:"--/--/----",
+      hora:"--:--"
+    };
+  }
 
   try{
-    return new Date(fecha).toLocaleTimeString("es-ES",{
-      hour:"2-digit",
-      minute:"2-digit"
-    });
+
+    const date = new Date(fecha);
+
+    const hora = new Intl.DateTimeFormat(
+      navigator.language || "es-ES",
+      {
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    ).format(date);
+
+    const fechaTexto = new Intl.DateTimeFormat(
+      navigator.language || "es-ES",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric"
+      }
+    ).format(date);
+
+    return {
+      fecha:fechaTexto,
+      hora:hora
+    };
+
   }catch(e){
-    return "--:--";
+
+    return {
+      fecha:"--/--/----",
+      hora:"--:--"
+    };
+
   }
+
 }
 
+
+function horaPartido(match){
+
+  return fechaHoraLocal(match).hora;
+
+}
+
+
+function fechaPartido(match){
+
+  return fechaHoraLocal(match).fecha;
+
+}
+
+
+/* =========================================================
+   ESTADO DEL PARTIDO
+   ========================================================= */
+
 function estadoPartido(match){
+
   const status = match?.fixture?.status;
 
-  if(status?.short === "NS"){
+  if(!status){
+    return "--:--";
+  }
+
+  if(status.short === "NS"){
     return horaPartido(match);
   }
 
-  if(status?.short === "HT"){
+  if(status.short === "HT"){
     return "DESCANSO";
   }
 
-  if(status?.short === "FT"){
+  if(status.short === "FT"){
     return "FINAL";
   }
 
-  if(status?.short === "PST"){
+  if(status.short === "PST"){
     return "APLAZADO";
   }
 
-  if(status?.short === "CANC"){
+  if(status.short === "CANC"){
     return "CANCELADO";
   }
 
-  if(status?.elapsed){
+  if(status.short === "ABD"){
+    return "ABANDONADO";
+  }
+
+  if(status.elapsed){
     return status.elapsed + "'";
   }
 
   return horaPartido(match);
+
 }
 
+
 function esEnVivo(match){
+
   const s = match?.fixture?.status?.short;
 
   return [
-    "1H","2H","HT","ET","BT",
-    "P","LIVE"
+    "1H",
+    "2H",
+    "HT",
+    "ET",
+    "BT",
+    "P",
+    "LIVE"
   ].includes(s);
+
 }
+
+
+/* =========================================================
+   COLORES PREDICCIÓN
+   ========================================================= */
 
 function colorPorcentaje(valor){
-  if(valor === null || valor === undefined || valor === "") return "";
 
-  const numero = parseFloat(String(valor).replace("%",""));
+  if(
+    valor === null ||
+    valor === undefined ||
+    valor === ""
+  ){
+    return "";
+  }
 
-  if(isNaN(numero)) return "";
+  const numero =
+    parseFloat(
+      String(valor).replace("%","")
+    );
 
-  if(numero >= 70) return "green";
-  if(numero >= 50) return "yellow";
+  if(isNaN(numero)){
+    return "";
+  }
+
+  if(numero >= 70){
+    return "green";
+  }
+
+  if(numero >= 50){
+    return "yellow";
+  }
 
   return "red";
+
 }
 
+
 function mostrarPorcentaje(valor){
-  if(valor === null || valor === undefined || valor === ""){
+
+  if(
+    valor === null ||
+    valor === undefined ||
+    valor === ""
+  ){
     return "—";
   }
 
-  return String(valor).includes("%") ? String(valor) : String(valor) + "%";
+  return String(valor).includes("%")
+    ? String(valor)
+    : String(valor) + "%";
+
 }
+
+
+/* =========================================================
+   FILTRO DE SEGURIDAD DEL FRONTEND
+   ========================================================= */
+
+function esCompeticionPermitida(match){
+
+  const liga = normalizarTexto(
+    obtenerLiga(match)
+  );
+
+  const permitidas =
+    competicionesPermitidas.map(
+      normalizarTexto
+    );
+
+  return permitidas.includes(liga);
+
+}
+
+
+/* =========================================================
+   ORDENAR
+   ========================================================= */
+
+function obtenerOrdenLiga(nombre){
+
+  const index =
+    ordenCompeticiones.findIndex(
+      liga =>
+        normalizarTexto(liga) ===
+        normalizarTexto(nombre)
+    );
+
+  return index === -1
+    ? 999
+    : index;
+
+}
+
 
 function ordenarPartidos(lista){
+
   return [...lista].sort((a,b)=>{
-    const da = new Date(a?.fixture?.date || 0).getTime();
-    const db = new Date(b?.fixture?.date || 0).getTime();
+
+    const ligaA = obtenerLiga(a);
+    const ligaB = obtenerLiga(b);
+
+    const ordenA =
+      obtenerOrdenLiga(ligaA);
+
+    const ordenB =
+      obtenerOrdenLiga(ligaB);
+
+    if(ordenA !== ordenB){
+      return ordenA - ordenB;
+    }
+
+    const da =
+      new Date(
+        a?.fixture?.date || 0
+      ).getTime();
+
+    const db =
+      new Date(
+        b?.fixture?.date || 0
+      ).getTime();
+
     return da - db;
+
   });
+
 }
+
+
+/* =========================================================
+   AGRUPAR PAÍS → LIGA
+   ========================================================= */
 
 function agrupar(lista){
+
   const paises = {};
 
-  lista.forEach(match=>{
-    const pais = obtenerPais(match);
-    const liga = obtenerLiga(match);
+  lista
+    .filter(esCompeticionPermitida)
+    .forEach(match=>{
 
-    if(!paises[pais]){
-      paises[pais] = {};
-    }
+      const pais =
+        obtenerPais(match);
 
-    if(!paises[pais][liga]){
-      paises[pais][liga] = [];
-    }
+      const liga =
+        obtenerLiga(match);
 
-    paises[pais][liga].push(match);
-  });
+      if(!paises[pais]){
+        paises[pais] = {};
+      }
+
+      if(!paises[pais][liga]){
+        paises[pais][liga] = [];
+      }
+
+      paises[pais][liga].push(match);
+
+    });
 
   return paises;
+
 }
 
+
+/* =========================================================
+   CREAR PARTIDO
+   ========================================================= */
+
 function crearPartido(match){
-  const home = match?.teams?.home || {};
-  const away = match?.teams?.away || {};
 
-  const live = esEnVivo(match);
+  const home =
+    match?.teams?.home || {};
 
-  const homeScore = match?.goals?.home;
-  const awayScore = match?.goals?.away;
+  const away =
+    match?.teams?.away || {};
+
+  const live =
+    esEnVivo(match);
+
+  const homeScore =
+    match?.goals?.home;
+
+  const awayScore =
+    match?.goals?.away;
 
   const scoreVisible =
     homeScore !== null &&
@@ -498,467 +999,341 @@ function crearPartido(match){
     awayScore !== null &&
     awayScore !== undefined;
 
-  const liga = obtenerLiga(match);
+  const liga =
+    obtenerLiga(match);
 
-  const puedePrediccion = ligasPrediccion.some(
-    nombre => liga.toLowerCase() === nombre.toLowerCase()
-  );
-
-  const id = match?.fixture?.id;
+  const id =
+    match?.fixture?.id;
 
   let html = `
+
     <div class="match">
 
       <div class="match-top">
+
         <span class="${live ? "live" : ""}">
-          ${live ? "🔴 EN VIVO" : "⚽ PARTIDO"}
+          ${
+            live
+            ? "🔴 EN VIVO"
+            : "⚽ PARTIDO"
+          }
         </span>
 
-        <span>${escapeHTML(estadoPartido(match))}</span>
+        <span>
+          ${escapeHTML(
+            estadoPartido(match)
+          )}
+        </span>
+
+      </div>
+
+      <div class="match-date">
+        📅 ${escapeHTML(
+          fechaPartido(match)
+        )}
+        &nbsp; • &nbsp;
+        🕐 ${escapeHTML(
+          horaPartido(match)
+        )}
       </div>
 
       <div class="teams">
 
         <div class="team">
+
           ${
             logoEquipo(home)
-            ? `<img src="${escapeHTML(logoEquipo(home))}" onerror="this.style.display='none'">`
-            : ""
+            ?
+            `<img
+              src="${escapeHTML(
+                logoEquipo(home)
+              )}"
+              onerror="this.style.display='none'"
+            >`
+            :
+            ""
           }
-          ${escapeHTML(nombreEquipo(home))}
+
+          ${escapeHTML(
+            nombreEquipo(home)
+          )}
+
         </div>
 
         <div class="score">
+
           ${
             scoreVisible
-            ? `${homeScore} - ${awayScore}`
-            : "VS"
+            ?
+            `${homeScore} - ${awayScore}`
+            :
+            "VS"
           }
+
         </div>
 
         <div class="team">
+
           ${
             logoEquipo(away)
-            ? `<img src="${escapeHTML(logoEquipo(away))}" onerror="this.style.display='none'">`
-            : ""
+            ?
+            `<img
+              src="${escapeHTML(
+                logoEquipo(away)
+              )}"
+              onerror="this.style.display='none'"
+            >`
+            :
+            ""
           }
-          ${escapeHTML(nombreEquipo(away))}
+
+          ${escapeHTML(
+            nombreEquipo(away)
+          )}
+
         </div>
 
       </div>
+
   `;
 
-  if(puedePrediccion && id){
+
+  if(id){
+
     html += `
-      <button class="pred-btn"
-        onclick="verPrediccion('${id}',this)">
+
+      <button
+        class="pred-btn"
+        onclick="verPrediccion('${id}',this)"
+      >
         🔮 VER PREDICCIÓN
       </button>
 
-      <div class="prediction" id="pred-${id}">
-        <div class="pred-title">🔮 Predicción</div>
-        <div class="small">Pulsa el botón para consultar los datos.</div>
+      <div
+        class="prediction"
+        id="pred-${id}"
+      >
+
+        <div class="pred-title">
+          🔮 PREDICCIONES CAPIBARBER
+        </div>
+
+        <div class="small">
+          Pulsa el botón para consultar los datos.
+        </div>
+
       </div>
+
     `;
+
   }
+
 
   html += `</div>`;
 
   return html;
+
 }
 
+
+/* =========================================================
+   CREAR HTML COMPLETO
+   ========================================================= */
+
 function crearHTML(lista){
-  if(!lista || lista.length === 0){
+
+  const filtrados =
+    (lista || [])
+    .filter(esCompeticionPermitida);
+
+  if(filtrados.length === 0){
+
     return `
+
       <div class="empty">
-        ⚽ No hay partidos para mostrar en esta sección.
+
+        ⚽ No hay partidos para mostrar
+        en esta sección.
+
+        <br><br>
+
+        <span class="small">
+          Las competiciones mostradas están
+          limitadas a las seleccionadas.
+        </span>
+
       </div>
+
     `;
+
   }
 
-  const grupos = agrupar(ordenarPartidos(lista));
+
+  const grupos =
+    agrupar(
+      ordenarPartidos(filtrados)
+    );
+
 
   let html = "";
 
-  const paises = Object.keys(grupos).sort((a,b)=>{
-    if(a === "International") return -1;
-    if(b === "International") return 1;
-    return a.localeCompare(b);
-  });
+
+  const paises =
+    Object.keys(grupos)
+    .sort((a,b)=>{
+
+      if(
+        a.toLowerCase()
+        .includes("international")
+      ){
+        return -1;
+      }
+
+      if(
+        b.toLowerCase()
+        .includes("international")
+      ){
+        return 1;
+      }
+
+      return a.localeCompare(b);
+
+    });
+
 
   paises.forEach(pais=>{
-    const ligas = grupos[pais];
+
+    const ligas =
+      grupos[pais];
+
+
+    const ligasOrdenadas =
+      Object.keys(ligas)
+      .sort(
+        (a,b)=>
+          obtenerOrdenLiga(a) -
+          obtenerOrdenLiga(b)
+      );
+
 
     html += `
+
       <div class="country">
 
-        <div class="country-title"
-             onclick="toggleElemento(this.nextElementSibling)">
-          🌎 ${escapeHTML(pais)}
-          <span>▼</span>
+        <div
+          class="country-title"
+          onclick="togglePais(this)"
+        >
+
+          <span>
+            🌎 ${escapeHTML(pais)}
+          </span>
+
+          <span class="country-arrow">
+            ▼
+          </span>
+
         </div>
 
-        <div>
+        <div class="country-content">
+
     `;
 
-    Object.keys(ligas).forEach(liga=>{
-      const partidos = ligas[liga];
+
+    ligasOrdenadas.forEach(liga=>{
+
+      const partidos =
+        ordenarPartidos(
+          ligas[liga]
+        );
+
 
       html += `
+
         <div class="league">
 
-          <div class="league-title"
-               onclick="toggleElemento(this.nextElementSibling)">
+          <div
+            class="league-title"
+            onclick="toggleLiga(this)"
+          >
+
             <span class="league-name">
               🏆 ${escapeHTML(liga)}
             </span>
 
-            <span class="league-count">
-              ${partidos.length} partidos ▼
+            <span class="league-right">
+
+              <span class="league-count">
+                ${partidos.length}
+              </span>
+
+              <span class="league-arrow">
+                ▼
+              </span>
+
             </span>
+
           </div>
 
           <div class="matches">
-            ${partidos.map(crearPartido).join("")}
+
+            ${partidos
+              .map(crearPartido)
+              .join("")}
+
           </div>
 
         </div>
+
       `;
+
     });
+
 
     html += `
+
         </div>
+
       </div>
+
     `;
+
   });
 
+
   return html;
+
 }
 
-function toggleElemento(elemento){
-  if(!elemento) return;
 
-  if(elemento.style.display === "none"){
-    elemento.style.display = "";
-  }else{
-    elemento.style.display = "none";
-  }
+/* =========================================================
+   ABRIR / CERRAR PAÍS
+   ========================================================= */
+
+function togglePais(titulo){
+
+  const country =
+    titulo.parentElement;
+
+  country.classList.toggle("closed");
+
 }
 
-function cambiarSeccion(seccion){
-  seccionActual = seccion;
 
-  document.getElementById("tabLive").classList.remove("active");
-  document.getElementById("tabToday").classList.remove("active");
-  document.getElementById("tabNext").classList.remove("active");
+/* =========================================================
+   ABRIR / CERRAR LIGA
+   ========================================================= */
 
-  if(seccion === "live"){
-    document.getElementById("tabLive").classList.add("active");
-  }
+function toggleLiga(titulo){
 
-  if(seccion === "today"){
-    document.getElementById("tabToday").classList.add("active");
-  }
+  const league =
+    titulo.parentElement;
 
-  if(seccion === "next"){
-    document.getElementById("tabNext").classList.add("active");
-  }
+  league.classList.toggle("closed");
 
-  mostrarSeccion();
 }
 
-function mostrarSeccion(){
-  const app = document.getElementById("app");
 
-  let lista = [];
-
-  if(seccionActual === "live"){
-    lista = datos.live;
-  }
-
-  if(seccionActual === "today"){
-    lista = datos.today;
-  }
-
-  if(seccionActual === "next"){
-    lista = datos.next;
-  }
-
-  app.innerHTML = crearHTML(lista);
-}
-
-async function fetchConTimeout(url,ms=20000){
-  const controller = new AbortController();
-
-  const timer = setTimeout(()=>{
-    controller.abort();
-  },ms);
-
-  try{
-    const respuesta = await fetch(url,{
-      signal:controller.signal,
-      cache:"no-store"
-    });
-
-    return respuesta;
-
-  }finally{
-    clearTimeout(timer);
-  }
-}
-
-async function cargarPartidos(){
-  if(cargando) return;
-
-  cargando = true;
-
-  const status = document.getElementById("status");
-  const app = document.getElementById("app");
-
-  status.innerHTML = "⏳ Cargando partidos...";
-
-  if(!datos.live.length && !datos.today.length && !datos.next.length){
-    app.innerHTML = `
-      <div class="loading">
-        ⚽ Cargando partidos...<br>
-        <span class="small">
-          Esto puede tardar unos segundos.
-        </span>
-      </div>
-    `;
-  }
-
-  try{
-
-    const respuesta = await fetchConTimeout(
-      "/api/football?t=" + Date.now(),
-      20000
-    );
-
-    if(!respuesta.ok){
-      throw new Error("HTTP " + respuesta.status);
-    }
-
-    const data = await respuesta.json();
-
-    if(!data || data.success !== true){
-      throw new Error("La API no devolvió datos válidos.");
-    }
-
-    datos.live = Array.isArray(data.enVivo)
-      ? data.enVivo
-      : [];
-
-    datos.today = Array.isArray(data.partidosHoy)
-      ? data.partidosHoy
-      : [];
-
-    datos.next = Array.isArray(data.partidosManana)
-      ? data.partidosManana
-      : [];
-
-    status.innerHTML =
-      `🟢 API conectada | 🔴 ${datos.live.length} en vivo | 📅 ${datos.today.length} hoy | ⏭️ ${datos.next.length} próximos`;
-
-    mostrarSeccion();
-
-  }catch(error){
-
-    console.error(error);
-
-    status.innerHTML =
-      "🔴 No se pudo cargar la API";
-
-    app.innerHTML = `
-      <div class="error">
-        <b>⚠️ No se pudieron cargar los partidos.</b>
-
-        <p>
-          La conexión tardó demasiado o la API devolvió un error.
-        </p>
-
-        <button class="retry" onclick="cargarPartidos()">
-          🔄 REINTENTAR
-        </button>
-      </div>
-    `;
-
-  }finally{
-    cargando = false;
-  }
-}
-
-async function verPrediccion(id,boton){
-
-  const caja = document.getElementById("pred-" + id);
-
-  if(!caja) return;
-
-  caja.classList.add("show");
-
-  boton.disabled = true;
-  boton.innerText = "⏳ Cargando predicción...";
-
-  caja.innerHTML = `
-    <div class="pred-title">🔮 Predicción</div>
-    <div class="small">
-      Consultando datos reales...
-    </div>
-  `;
-
-  try{
-
-    const respuesta = await fetchConTimeout(
-      "/api/football?prediction=" +
-      encodeURIComponent(id) +
-      "&t=" + Date.now(),
-      20000
-    );
-
-    if(!respuesta.ok){
-      throw new Error("HTTP " + respuesta.status);
-    }
-
-    const data = await respuesta.json();
-
-    const prediccion =
-      data?.response?.[0]?.predictions ||
-      data?.predictions ||
-      null;
-
-    if(!prediccion){
-
-      caja.innerHTML = `
-        <div class="pred-title">🔮 Predicción</div>
-        <div class="note">
-          ⚠️ Este partido no tiene predicción disponible.
-        </div>
-      `;
-
-      return;
-    }
-
-    const percent = prediccion.percent || {};
-
-    const home = percent.home ?? null;
-    const draw = percent.draw ?? null;
-    const away = percent.away ?? null;
-
-    const btts =
-      prediccion.btts?.yes ??
-      prediccion.btts?.Yes ??
-      null;
-
-    const underOver =
-      prediccion.under_over ??
-      prediccion.under_over_1_5 ??
-      null;
-
-    const winner =
-      prediccion.winner?.name ??
-      null;
-
-    const advice =
-      prediccion.advice ??
-      null;
-
-    caja.innerHTML = `
-      <div class="pred-title">
-        🔮 DATOS DE PREDICCIÓN
-      </div>
-
-      <div class="pred-grid">
-
-        <div class="pred-item">
-          🏠 LOCAL
-          <span class="percent ${colorPorcentaje(home)}">
-            ${mostrarPorcentaje(home)}
-          </span>
-        </div>
-
-        <div class="pred-item">
-          🤝 EMPATE
-          <span class="percent ${colorPorcentaje(draw)}">
-            ${mostrarPorcentaje(draw)}
-          </span>
-        </div>
-
-        <div class="pred-item">
-          ✈️ VISITANTE
-          <span class="percent ${colorPorcentaje(away)}">
-            ${mostrarPorcentaje(away)}
-          </span>
-        </div>
-
-      </div>
-
-      <div class="pred-grid" style="margin-top:6px">
-
-        <div class="pred-item">
-          ⚽ BTTS
-          <span class="percent ${colorPorcentaje(btts)}">
-            ${mostrarPorcentaje(btts)}
-          </span>
-        </div>
-
-        <div class="pred-item">
-          📊 O/U
-          <span class="percent">
-            ${underOver ? escapeHTML(underOver) : "—"}
-          </span>
-        </div>
-
-        <div class="pred-item">
-          🏆 GANADOR
-          <span class="percent" style="font-size:12px">
-            ${winner ? escapeHTML(winner) : "—"}
-          </span>
-        </div>
-
-      </div>
-
-      ${
-        advice
-        ? `<div class="note">💡 ${escapeHTML(advice)}</div>`
-        : ""
-      }
-
-      <div class="note">
-        Los porcentajes se muestran solamente cuando la API los proporciona.
-      </div>
-    `;
-
-  }catch(error){
-
-    console.error(error);
-
-    caja.innerHTML = `
-      <div class="pred-title">
-        🔮 Predicción
-      </div>
-
-      <div class="note">
-        ⚠️ No se pudo consultar la predicción.
-      </div>
-    `;
-
-  }finally{
-
-    boton.disabled = false;
-    boton.innerText = "🔮 VER PREDICCIÓN";
-
-  }
-}
-
-/* CARGA INICIAL */
-cargarPartidos();
-
-/* ACTUALIZAR CADA 60 SEGUNDOS */
-setInterval(()=>{
-  cargarPartidos();
-},60000);
-
-</script>
-
-</body>
-</html>
+/* =========================================================
+   CAMBIAR SECCIÓN
+   ========================================================= *
