@@ -9,14 +9,6 @@ export default async function handler(req, res) {
       });
     }
 
-    const hoy = new Date();
-
-    const mananaFecha = new Date(hoy);
-    mananaFecha.setUTCDate(mananaFecha.getUTCDate() + 1);
-
-    const fechaHoy = hoy.toISOString().slice(0, 10);
-    const fechaManana = mananaFecha.toISOString().slice(0, 10);
-
     const headers = {
       "x-apisports-key": API_KEY,
       "Accept": "application/json"
@@ -52,6 +44,57 @@ export default async function handler(req, res) {
       return datos;
     }
 
+    /*
+    ============================================================
+    PRUEBA DE PREDICCIÓN
+    ============================================================
+
+    Para probar una predicción:
+
+    /api/football?prediction=ID_DEL_PARTIDO
+
+    Ejemplo:
+
+    /api/football?prediction=123456
+
+    NO se ejecutan predicciones automáticamente.
+    Esto evita gastar llamadas innecesarias.
+    */
+
+    const predictionId =
+      req.query?.prediction ||
+      req.query?.fixture;
+
+    if (predictionId) {
+      const datosPrediccion = await consultar(
+        `https://v3.football.api-sports.io/predictions?fixture=${encodeURIComponent(predictionId)}`
+      );
+
+      return res.status(200).json({
+        success: true,
+        tipo: "prediction",
+        fixture: predictionId,
+        predictions: datosPrediccion.response || [],
+        errors: datosPrediccion.errors || {}
+      });
+    }
+
+    /*
+    ============================================================
+    PARTIDOS NORMALES
+    ============================================================
+    */
+
+    const hoy = new Date();
+
+    const mananaFecha = new Date(hoy);
+    mananaFecha.setUTCDate(
+      mananaFecha.getUTCDate() + 1
+    );
+
+    const fechaHoy = hoy.toISOString().slice(0, 10);
+    const fechaManana = mananaFecha.toISOString().slice(0, 10);
+
     let datosVivo = {
       response: [],
       errors: {}
@@ -73,9 +116,11 @@ export default async function handler(req, res) {
       manana: null
     };
 
-    // =========================
-    // PARTIDOS EN VIVO
-    // =========================
+    /*
+    ============================================================
+    EN VIVO
+    ============================================================
+    */
 
     try {
       datosVivo = await consultar(
@@ -85,9 +130,11 @@ export default async function handler(req, res) {
       errores.live = error.message;
     }
 
-    // =========================
-    // PARTIDOS DE HOY
-    // =========================
+    /*
+    ============================================================
+    PARTIDOS DE HOY
+    ============================================================
+    */
 
     try {
       datosHoy = await consultar(
@@ -97,9 +144,11 @@ export default async function handler(req, res) {
       errores.hoy = error.message;
     }
 
-    // =========================
-    // PARTIDOS DE MAÑANA
-    // =========================
+    /*
+    ============================================================
+    PARTIDOS DE MAÑANA
+    ============================================================
+    */
 
     try {
       datosManana = await consultar(
@@ -108,10 +157,6 @@ export default async function handler(req, res) {
     } catch (error) {
       errores.manana = error.message;
     }
-
-    // =========================
-    // ARRAYS
-    // =========================
 
     const enVivo = Array.isArray(datosVivo.response)
       ? datosVivo.response
@@ -125,9 +170,11 @@ export default async function handler(req, res) {
       ? datosManana.response
       : [];
 
-    // =========================
-    // UNIR Y ELIMINAR DUPLICADOS
-    // =========================
+    /*
+    ============================================================
+    ELIMINAR PARTIDOS DUPLICADOS
+    ============================================================
+    */
 
     const mapa = new Map();
 
@@ -136,7 +183,6 @@ export default async function handler(req, res) {
       ...partidosHoy,
       ...partidosManana
     ].forEach(partido => {
-
       if (
         partido &&
         partido.fixture &&
@@ -147,32 +193,39 @@ export default async function handler(req, res) {
           partido
         );
       }
-
     });
 
-    const partidos = Array.from(mapa.values());
+    const partidos = Array.from(
+      mapa.values()
+    );
 
-    // =========================
-    // RESPUESTA
-    // =========================
+    /*
+    ============================================================
+    RESPUESTA FINAL
+    ============================================================
+    */
 
     return res.status(200).json({
-
       success: true,
 
-      fechaActual: new Date().toISOString(),
+      fechaActual:
+        new Date().toISOString(),
 
       hoy: fechaHoy,
 
       manana: fechaManana,
 
-      cantidadEnVivo: enVivo.length,
+      cantidadEnVivo:
+        enVivo.length,
 
-      cantidadHoy: partidosHoy.length,
+      cantidadHoy:
+        partidosHoy.length,
 
-      cantidadManana: partidosManana.length,
+      cantidadManana:
+        partidosManana.length,
 
-      cantidadTotal: partidos.length,
+      cantidadTotal:
+        partidos.length,
 
       enVivo,
 
@@ -182,28 +235,31 @@ export default async function handler(req, res) {
 
       partidos,
 
-      // Información para depuración
       api: {
-        liveErrors: datosVivo.errors || {},
-        hoyErrors: datosHoy.errors || {},
-        mananaErrors: datosManana.errors || {},
+        liveErrors:
+          datosVivo.errors || {},
+
+        hoyErrors:
+          datosHoy.errors || {},
+
+        mananaErrors:
+          datosManana.errors || {},
 
         errores
       }
-
     });
 
   } catch (error) {
-
-    console.error("ERROR API FOOTBALL:", error);
+    console.error(
+      "ERROR API FOOTBALL:",
+      error
+    );
 
     return res.status(500).json({
-
       success: false,
-
-      error: error.message || "Error interno del servidor"
-
+      error:
+        error.message ||
+        "Error interno del servidor"
     });
-
   }
 }
