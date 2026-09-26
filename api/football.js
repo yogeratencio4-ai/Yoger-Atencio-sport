@@ -1,219 +1,383 @@
-export default async function handler(req, res) {
+export default async function handler(request, response) {
+  const API_KEY = process.env.API_FOOTBALL_KEY;
+
+  if (!API_KEY) {
+    return response.status(500).json({
+      success: false,
+      error: "Falta API_FOOTBALL_KEY en Vercel"
+    });
+  }
+
+  const baseURL = "https://v3.football.api-sports.io";
+  const headers = {
+    "x-apisports-key": API_KEY
+  };
+
   try {
-    const API_KEY = process.env.API_FOOTBALL_KEY;
-
-    if (!API_KEY) {
-      return res.status(500).json({
-        success: false,
-        error: "Falta API_FOOTBALL_KEY en Vercel"
-      });
-    }
-
-    const headers = {
-      "x-apisports-key": API_KEY,
-      "Accept": "application/json"
-    };
-
-    async function consultar(url) {
-      const respuesta = await fetch(url, {
-        method: "GET",
-        headers,
-        cache: "no-store"
-      });
-
-      const texto = await respuesta.text();
-
-      let datos;
-
-      try {
-        datos = JSON.parse(texto);
-      } catch {
-        throw new Error(
-          "API-Football devolvió una respuesta que no es JSON"
-        );
-      }
-
-      if (!respuesta.ok) {
-        throw new Error(
-          datos?.message ||
-          datos?.errors?.requests ||
-          `Error HTTP ${respuesta.status}`
-        );
-      }
-
-      return datos;
-    }
-
     /*
-    ============================================================
-    PRUEBA DE PREDICCIÓN
-    ============================================================
+     * =========================================================
+     * PREDICCIÓN DE UN PARTIDO
+     * /api/football?prediction=ID
+     * =========================================================
+     */
 
-    Para probar una predicción:
+    if (request.query.prediction) {
+      const fixtureId = request.query.prediction;
 
-    /api/football?prediction=ID_DEL_PARTIDO
+      const url =
+        `${baseURL}/predictions?fixture=${encodeURIComponent(fixtureId)}`;
 
-    Ejemplo:
+      const apiResponse = await fetch(url, {
+        method: "GET",
+        headers
+      });
 
-    /api/football?prediction=123456
+      const data = await apiResponse.json();
 
-    NO se ejecutan predicciones automáticamente.
-    Esto evita gastar llamadas innecesarias.
-    */
+      /*
+       * API-Football devuelve normalmente:
+       *
+       * {
+       *   response: [
+       *     {
+       *       predictions: {
+       *         winner: {...},
+       *         under_over: "...",
+       *         advice: "...",
+       *         percent: {
+       *           home: "...",
+       *           draw: "...",
+       *           away: "..."
+       *         }
+       *       }
+       *     }
+       *   ]
+       * }
+       */
 
-    const predictionId =
-      req.query?.prediction ||
-      req.query?.fixture;
+      if (!apiResponse.ok) {
+        return response.status(apiResponse.status).json({
+          success: false,
+          tipo: "prediction",
+          fixture: fixtureId,
+          error: data?.errors || "Error consultando predicción"
+        });
+      }
 
-    if (predictionId) {
-      const datosPrediccion = await consultar(
-        `https://v3.football.api-sports.io/predictions?fixture=${encodeURIComponent(predictionId)}`
-      );
+      if (data?.errors && Object.keys(data.errors).length > 0) {
+        return response.status(200).json({
+          success: false,
+          tipo: "prediction",
+          fixture: fixtureId,
+          error: data.errors
+        });
+      }
 
-      return res.status(200).json({
+      const resultado = data?.response?.[0];
+
+      if (!resultado) {
+        return response.status(200).json({
+          success: true,
+          tipo: "prediction",
+          fixture: fixtureId,
+          disponible: false,
+          predictions: null
+        });
+      }
+
+      const pred = resultado.predictions || {};
+
+      /*
+       * Porcentajes 1X2
+       */
+      const percent = pred.percent || {};
+
+      const local =
+        percent.home ??
+        null;
+
+      const empate =
+        percent.draw ??
+        null;
+
+      const visitante =
+        percent.away ??
+        null;
+
+      /*
+       * BTTS
+       *
+       * API-Football puede devolver:
+       * btts: {
+       *   yes: "XX%",
+       *   no: "XX%"
+       * }
+       */
+
+      const btts =
+        pred.btts?.yes ??
+        null;
+
+      /*
+       * Predicción de goles.
+       *
+       * IMPORTANTE:
+       * API-Football proporciona "under_over"
+       * como predicción de línea, por ejemplo:
+       * "Over 2.5"
+       *
+       * No vamos a inventar un porcentaje
+       * para Over 1.5 o Under 3.5.
+       */
+
+      const underOver =
+        pred.under_over ??
+        null;
+
+      /*
+       * Ganador
+       */
+
+      let ganador = null;
+
+      if (pred.winner) {
+        ganador =
+          pred.winner.name ??
+          null;
+      }
+
+      /*
+       * Consejo de la API
+       */
+
+      const consejo =
+        pred.advice ??
+        null;
+
+      /*
+       * Resultado NORMALIZADO para nuestro index.html
+       */
+
+      return response.status(200).json({
         success: true,
         tipo: "prediction",
-        fixture: predictionId,
-        predictions: datosPrediccion.response || [],
-        errors: datosPrediccion.errors || {}
+        fixture: fixtureId,
+        disponible: true,
+
+        predictions: {
+          percent: {
+            home: local,
+            draw: empate,
+            away: visitante
+          },
+
+          btts: {
+            yes: btts,
+            no: pred.btts?.no ?? null
+          },
+
+          under_over: underOver,
+
+          winner: {
+            name: ganador
+          },
+
+          advice: consejo,
+
+          goals: {
+            home: pred.goals?.home ?? null,
+            away: pred.goals?.away ?? null
+          },
+
+          win_or_draw:
+            pred.win_or_draw ??
+            null
+        }
       });
     }
 
+
     /*
-    ============================================================
-    PARTIDOS NORMALES
-    ============================================================
-    */
+     * =========================================================
+     * CONSULTA DIRECTA POR FIXTURE
+     * /api/football?fixture=ID
+     * =========================================================
+     */
 
-    const hoy = new Date();
+    if (request.query.fixture) {
+      const fixtureId = request.query.fixture;
 
-    const mananaFecha = new Date(hoy);
-    mananaFecha.setUTCDate(
-      mananaFecha.getUTCDate() + 1
-    );
+      const url =
+        `${baseURL}/fixtures?id=${encodeURIComponent(fixtureId)}`;
 
-    const fechaHoy = hoy.toISOString().slice(0, 10);
-    const fechaManana = mananaFecha.toISOString().slice(0, 10);
+      const apiResponse = await fetch(url, {
+        method: "GET",
+        headers
+      });
 
-    let datosVivo = {
-      response: [],
-      errors: {}
-    };
+      const data = await apiResponse.json();
 
-    let datosHoy = {
-      response: [],
-      errors: {}
-    };
+      return response.status(apiResponse.status).json(data);
+    }
 
-    let datosManana = {
-      response: [],
-      errors: {}
-    };
+
+    /*
+     * =========================================================
+     * PARTIDOS
+     * =========================================================
+     */
+
+    const ahora = new Date();
+
+    /*
+     * Usamos fecha UTC para mantener compatibilidad
+     * con la API.
+     */
+
+    const fechaHoy =
+      ahora.toISOString().slice(0, 10);
+
+    const mananaDate =
+      new Date(ahora.getTime() + 24 * 60 * 60 * 1000);
+
+    const fechaManana =
+      mananaDate.toISOString().slice(0, 10);
+
+
+    /*
+     * =========================================================
+     * LLAMADAS A API-FOOTBALL
+     * =========================================================
+     */
+
+    const urlLive =
+      `${baseURL}/fixtures?live=all`;
+
+    const urlHoy =
+      `${baseURL}/fixtures?date=${fechaHoy}`;
+
+    const urlManana =
+      `${baseURL}/fixtures?date=${fechaManana}`;
+
+
+    const [liveResult, hoyResult, mananaResult] =
+      await Promise.all([
+        fetch(urlLive, {
+          method: "GET",
+          headers
+        }),
+
+        fetch(urlHoy, {
+          method: "GET",
+          headers
+        }),
+
+        fetch(urlManana, {
+          method: "GET",
+          headers
+        })
+      ]);
+
+
+    /*
+     * Convertimos respuestas a JSON
+     */
+
+    const liveData =
+      await liveResult.json();
+
+    const hoyData =
+      await hoyResult.json();
+
+    const mananaData =
+      await mananaResult.json();
+
+
+    /*
+     * =========================================================
+     * ERRORES
+     * =========================================================
+     */
 
     const errores = {
-      live: null,
-      hoy: null,
-      manana: null
+      live: liveData?.errors || null,
+      hoy: hoyData?.errors || null,
+      manana: mananaData?.errors || null
     };
 
-    /*
-    ============================================================
-    EN VIVO
-    ============================================================
-    */
-
-    try {
-      datosVivo = await consultar(
-        "https://v3.football.api-sports.io/fixtures?live=all"
-      );
-    } catch (error) {
-      errores.live = error.message;
-    }
 
     /*
-    ============================================================
-    PARTIDOS DE HOY
-    ============================================================
-    */
+     * =========================================================
+     * ARRAYS
+     * =========================================================
+     */
 
-    try {
-      datosHoy = await consultar(
-        `https://v3.football.api-sports.io/fixtures?date=${fechaHoy}`
-      );
-    } catch (error) {
-      errores.hoy = error.message;
-    }
+    const enVivo =
+      Array.isArray(liveData?.response)
+        ? liveData.response
+        : [];
 
-    /*
-    ============================================================
-    PARTIDOS DE MAÑANA
-    ============================================================
-    */
+    const partidosHoy =
+      Array.isArray(hoyData?.response)
+        ? hoyData.response
+        : [];
 
-    try {
-      datosManana = await consultar(
-        `https://v3.football.api-sports.io/fixtures?date=${fechaManana}`
-      );
-    } catch (error) {
-      errores.manana = error.message;
-    }
+    const partidosManana =
+      Array.isArray(mananaData?.response)
+        ? mananaData.response
+        : [];
 
-    const enVivo = Array.isArray(datosVivo.response)
-      ? datosVivo.response
-      : [];
-
-    const partidosHoy = Array.isArray(datosHoy.response)
-      ? datosHoy.response
-      : [];
-
-    const partidosManana = Array.isArray(datosManana.response)
-      ? datosManana.response
-      : [];
 
     /*
-    ============================================================
-    ELIMINAR PARTIDOS DUPLICADOS
-    ============================================================
-    */
+     * =========================================================
+     * ELIMINAR DUPLICADOS
+     * =========================================================
+     */
 
-    const mapa = new Map();
+    const mapa =
+      new Map();
 
     [
       ...enVivo,
       ...partidosHoy,
       ...partidosManana
     ].forEach(partido => {
+
       if (
-        partido &&
-        partido.fixture &&
-        partido.fixture.id
+        partido?.fixture?.id !== undefined &&
+        partido?.fixture?.id !== null
       ) {
         mapa.set(
           partido.fixture.id,
           partido
         );
       }
+
     });
 
-    const partidos = Array.from(
-      mapa.values()
-    );
+
+    const partidos =
+      Array.from(mapa.values());
+
 
     /*
-    ============================================================
-    RESPUESTA FINAL
-    ============================================================
-    */
+     * =========================================================
+     * RESPUESTA FINAL
+     * =========================================================
+     */
 
-    return res.status(200).json({
+    return response.status(200).json({
+
       success: true,
 
       fechaActual:
-        new Date().toISOString(),
+        ahora.toISOString(),
 
-      hoy: fechaHoy,
+      hoy:
+        fechaHoy,
 
-      manana: fechaManana,
+      manana:
+        fechaManana,
 
       cantidadEnVivo:
         enVivo.length,
@@ -237,29 +401,33 @@ export default async function handler(req, res) {
 
       api: {
         liveErrors:
-          datosVivo.errors || {},
+          errores.live,
 
         hoyErrors:
-          datosHoy.errors || {},
+          errores.hoy,
 
         mananaErrors:
-          datosManana.errors || {},
-
-        errores
+          errores.manana
       }
+
     });
 
   } catch (error) {
+
     console.error(
       "ERROR API FOOTBALL:",
       error
     );
 
-    return res.status(500).json({
+    return response.status(500).json({
+
       success: false,
+
       error:
-        error.message ||
+        error?.message ||
         "Error interno del servidor"
+
     });
+
   }
 }
