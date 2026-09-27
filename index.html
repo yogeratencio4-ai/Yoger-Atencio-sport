@@ -2,127 +2,173 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YOGER ATENCIO SPORT</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  background:#06130d;
+  background:#06150f;
   color:#fff;
   font-family:Arial,Helvetica,sans-serif;
 }
-header{
-  background:linear-gradient(135deg,#0b3d24,#062416);
-  padding:18px 12px;
-  text-align:center;
-  border-bottom:2px solid #1e7545;
-}
-header h1{margin:0;font-size:25px}
-header p{margin:5px 0 0;color:#9ee7b9;font-size:12px;font-weight:bold}
 
-.tabs{
-  display:flex;
-  gap:7px;
-  padding:10px;
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:#06130d;
+header{
+  background:linear-gradient(135deg,#073d24,#0b6b3d);
+  padding:20px 14px;
+  text-align:center;
+  border-bottom:2px solid #16c172;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
 }
-.tabs button{
-  flex:1;
-  border:1px solid #286b47;
-  background:#10251a;
-  color:#fff;
-  padding:11px 5px;
-  border-radius:10px;
+
+header h1{
+  margin:0;
+  font-size:25px;
+  font-weight:900;
+}
+
+header p{
+  margin:6px 0 0;
+  color:#b8ffd8;
+  font-size:13px;
   font-weight:bold;
 }
-.tabs button.active{
-  background:#17663b;
-  border-color:#3dc978;
+
+.contenedor{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+  padding:12px;
 }
 
-#estado{
+.estado-api{
   text-align:center;
-  color:#8fa99a;
+  padding:9px;
+  margin-bottom:12px;
+  border-radius:10px;
+  background:#0b2519;
+  color:#9fffc3;
   font-size:12px;
-  padding:5px 10px 10px;
 }
 
-.seccion{display:none;padding:0 9px 25px}
-.seccion.active{display:block}
+.seccion{
+  margin-bottom:18px;
+}
+
+.seccion-titulo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#0b301e;
+  border:1px solid #145d38;
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.contador{
+  background:#16c172;
+  color:#02150c;
+  padding:4px 9px;
+  border-radius:20px;
+  font-size:12px;
+}
 
 .pais{
-  margin:12px 0 8px;
-  border:1px solid #205f3e;
+  margin:10px 0;
+  border:1px solid #12452c;
   border-radius:12px;
   overflow:hidden;
-  background:#0b1c13;
+  background:#081d13;
 }
-.paisTitulo{
-  width:100%;
-  border:0;
-  background:#123c27;
-  color:#fff;
-  padding:13px;
-  text-align:left;
-  font-size:15px;
-  font-weight:900;
+
+.pais-titulo{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  padding:13px;
+  cursor:pointer;
+  background:linear-gradient(90deg,#0b3822,#0a2819);
+  font-weight:900;
+}
+
+.pais-titulo span:last-child{
+  color:#67e8a5;
+}
+
+.pais-contenido{
+  display:none;
+  padding:7px;
+}
+
+.pais.abierto .pais-contenido{
+  display:block;
 }
 
 .liga{
-  margin:8px;
-  border:1px solid #244b36;
+  margin:8px 0;
+  border:1px solid #153d29;
   border-radius:10px;
   overflow:hidden;
-  background:#09150f;
 }
-.ligaTitulo{
-  width:100%;
-  border:0;
-  background:#16291e;
-  color:#d8ffe5;
-  padding:11px;
-  text-align:left;
-  font-weight:900;
+
+.liga-titulo{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  padding:11px;
+  background:#0c2518;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:bold;
 }
 
-.partidos{padding:7px}
+.liga-titulo .flecha{
+  color:#54e79a;
+  font-size:12px;
+}
+
+.liga-contenido{
+  display:none;
+  padding:6px;
+}
+
+.liga.abierta .liga-contenido{
+  display:block;
+}
 
 .partido{
-  background:#102119;
-  border:1px solid #254635;
-  border-radius:11px;
-  margin-bottom:8px;
-  padding:10px;
+  background:#0a2116;
+  border:1px solid #164a30;
+  border-radius:10px;
+  padding:12px;
+  margin:7px 0;
 }
 
-.cabeceraPartido{
+.partido:hover{
+  border-color:#1bd477;
+}
+
+.info-partido{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:8px;
-}
-
-.estadoPartido{
-  font-size:10px;
-  font-weight:900;
-  color:#6cff9c;
-}
-
-.fecha{
-  color:#aebdb4;
   font-size:11px;
-  margin:5px 0 8px;
+  color:#8dc9a8;
+  margin-bottom:10px;
+}
+
+.hora{
+  color:#fff;
+  font-size:15px;
+  font-weight:900;
 }
 
 .equipos{
@@ -133,115 +179,138 @@ header p{margin:5px 0 0;color:#9ee7b9;font-size:12px;font-weight:bold}
 }
 
 .vs{
-  color:#63d98d;
+  color:#58d894;
   font-size:11px;
+  margin:2px 0;
 }
 
 .marcador{
   text-align:center;
-  font-size:20px;
-  font-weight:1000;
-  margin:4px;
+  margin-top:4px;
+  font-size:22px;
+  font-weight:900;
 }
 
-.predBtn{
-  width:100%;
-  margin-top:9px;
-  padding:11px;
-  border:1px solid #d6a938;
-  border-radius:9px;
-  background:#3b2c08;
-  color:#ffe28a;
-  font-weight:1000;
-}
-
-.predPanel{
-  display:none;
-  margin-top:9px;
-  border-top:1px solid #345444;
-  padding-top:9px;
-}
-
-.predPanel.abierto{display:block}
-
-.predTitulo{
-  text-align:center;
-  color:#ffd75e;
-  font-weight:1000;
-  margin-bottom:8px;
-}
-
-.mercado{
-  background:#0a1710;
-  border:1px solid #233d2d;
-  border-radius:9px;
-  padding:8px;
-  margin:6px 0;
-}
-
-.mercadoTitulo{
-  color:#bdeacb;
-  font-size:11px;
-  font-weight:bold;
-  margin-bottom:6px;
-}
-
-.opciones{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-}
-
-.opcion{
-  background:#15251b;
-  border-radius:7px;
-  padding:8px;
-  text-align:center;
-  font-size:11px;
-}
-
-.porcentaje{
-  display:block;
-  font-size:17px;
-  font-weight:1000;
-  color:#72ffa1;
-  margin-top:2px;
-}
-
-.fuentes{
-  color:#899c91;
+.en-vivo{
+  display:inline-block;
+  background:#d91616;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:20px;
   font-size:10px;
-  line-height:1.5;
-  margin-top:8px;
+  font-weight:bold;
 }
 
-.cargandoPred{
+.boton-pred{
+  width:100%;
+  border:0;
+  margin-top:11px;
+  padding:11px;
+  border-radius:9px;
+  background:linear-gradient(90deg,#087a43,#13b968);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.boton-pred:active{
+  transform:scale(.98);
+}
+
+.prediccion{
+  display:none;
+  margin-top:10px;
+  padding:12px;
+  border-radius:10px;
+  background:#05130c;
+  border:1px solid #17613a;
+}
+
+.prediccion.visible{
+  display:block;
+}
+
+.pred-titulo{
   text-align:center;
-  color:#aaa;
-  padding:10px;
-  font-size:12px;
+  color:#72efa9;
+  font-weight:900;
+  margin-bottom:10px;
 }
 
-.sinDatos{
+.grid-pred{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.pred-box{
+  background:#0b2518;
+  border-radius:8px;
+  padding:9px 5px;
   text-align:center;
-  color:#c5a85b;
-  font-size:12px;
-  padding:10px;
 }
 
-.otro{
+.pred-box small{
+  display:block;
+  color:#8ebca1;
+  font-size:10px;
+}
+
+.pred-box strong{
+  display:block;
+  margin-top:4px;
+  font-size:17px;
+}
+
+.pred-line{
   display:flex;
   justify-content:space-between;
-  padding:7px;
-  border-bottom:1px solid #1c3023;
-  font-size:11px;
+  gap:8px;
+  padding:8px 0;
+  border-bottom:1px solid #123722;
+  font-size:13px;
 }
-.otro:last-child{border-bottom:0}
+
+.pred-line:last-child{
+  border-bottom:0;
+}
+
+.consejo{
+  margin-top:10px;
+  padding:10px;
+  background:#0d3220;
+  border-radius:8px;
+  color:#b8ffd4;
+  font-size:12px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.cargando{
+  text-align:center;
+  color:#8ff0b6;
+  padding:10px;
+  font-size:12px;
+}
+
+.sin-datos{
+  text-align:center;
+  padding:10px;
+  color:#ffcc75;
+  font-size:12px;
+}
 
 .vacio{
   text-align:center;
-  color:#82968a;
-  padding:35px 10px;
+  padding:25px 10px;
+  color:#7ea38d;
+}
+
+footer{
+  text-align:center;
+  padding:25px 10px;
+  color:#557765;
+  font-size:11px;
 }
 </style>
 </head>
@@ -253,25 +322,60 @@ header p{margin:5px 0 0;color:#9ee7b9;font-size:12px;font-weight:bold}
   <p>PARTIDOS DE FÚTBOL EN VIVO</p>
 </header>
 
-<div class="tabs">
-  <button id="tabVivo" onclick="mostrarSeccion('vivo')" class="active">🔴 EN VIVO</button>
-  <button id="tabHoy" onclick="mostrarSeccion('hoy')">📅 HOY</button>
-  <button id="tabProx" onclick="mostrarSeccion('proximos')">⏭️ PRÓXIMOS</button>
+<div class="contenedor">
+
+  <div id="estadoApi" class="estado-api">
+    🔄 Cargando partidos...
+  </div>
+
+  <section class="seccion">
+    <div class="seccion-titulo">
+      <span>🔴 EN VIVO</span>
+      <span id="contadorVivo" class="contador">0</span>
+    </div>
+    <div id="vivo"></div>
+  </section>
+
+  <section class="seccion">
+    <div class="seccion-titulo">
+      <span>📅 HOY</span>
+      <span id="contadorHoy" class="contador">0</span>
+    </div>
+    <div id="hoy"></div>
+  </section>
+
+  <section class="seccion">
+    <div class="seccion-titulo">
+      <span>⏭️ PRÓXIMOS</span>
+      <span id="contadorProximos" class="contador">0</span>
+    </div>
+    <div id="proximos"></div>
+  </section>
+
 </div>
 
-<div id="estado">Cargando partidos...</div>
-
-<section id="vivo" class="seccion active"></section>
-<section id="hoy" class="seccion"></section>
-<section id="proximos" class="seccion"></section>
+<footer>
+  YOGER ATENCIO SPORT ⚽
+</footer>
 
 <script>
 
-let datos=[];
-const cachePred={};
+const API_URL = "/api/football";
+const PRED_URL = "/api/predictions";
 
-function escapar(t){
-  return String(t ?? "")
+let datosGlobales = null;
+
+
+/* =====================================================
+   UTILIDADES
+===================================================== */
+
+function texto(valor){
+  return String(valor ?? "");
+}
+
+function esc(valor){
+  return texto(valor)
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
@@ -279,835 +383,808 @@ function escapar(t){
     .replace(/'/g,"&#039;");
 }
 
-function valor(obj,...claves){
-  for(const c of claves){
-    if(obj && obj[c] !== undefined && obj[c] !== null && obj[c] !== "")
-      return obj[c];
-  }
-  return null;
+function numero(valor){
+  const n = Number(valor);
+  return Number.isFinite(n) ? n : null;
 }
 
 function obtenerPartido(p){
 
-  const fixture=valor(p,"fixture") || {};
-  const partido=valor(p,"partido") || {};
-
-  const teams=valor(p,"teams","equipos") || {};
-  const home=valor(teams,"home","local") || {};
-  const away=valor(teams,"away","visitante") || {};
-
-  const league=valor(p,"league","liga") || {};
-
-  const local=valor(home,"name","nombre") ||
-              valor(p,"home","local") ||
-              valor(partido,"local") ||
-              "Local";
-
-  const visitante=valor(away,"name","nombre") ||
-                   valor(p,"away","visitante") ||
-                   valor(partido,"visitante") ||
-                   "Visitante";
-
-  const fecha=valor(fixture,"date","fecha") ||
-              valor(p,"date","fecha") ||
-              valor(partido,"fecha");
-
-  const status=valor(fixture,"status","estado") ||
-               valor(p,"status","estado") ||
-               {};
-
-  const estado=typeof status==="object"
-    ? valor(status,"short","codigo","long","nombre")
-    : status;
-
-  const goles=valor(p,"goals","goles","score","marcador","resultado") || {};
-
-  const gl=valor(goles,"home","local","locales");
-  const gv=valor(goles,"away","visitante","visitantes");
-
-  const fixtureId=
-    valor(fixture,"id") ||
-    valor(p,"fixtureId") ||
-    valor(p,"id") ||
-    null;
-
   return {
+    id: p?.fixture?.id ?? p?.id ?? null,
 
-    id: fixtureId || (local+"-"+visitante+"-"+fecha),
+    local:
+      p?.teams?.home?.name ??
+      p?.home?.name ??
+      p?.local ??
+      "Local",
 
-    fixtureId: fixtureId,
+    visitante:
+      p?.teams?.away?.name ??
+      p?.away?.name ??
+      p?.visitante ??
+      "Visitante",
 
-    local: local,
+    fecha:
+      p?.fixture?.date ??
+      p?.date ??
+      null,
 
-    visitante: visitante,
+    estado:
+      p?.fixture?.status?.short ??
+      p?.status?.short ??
+      p?.status ??
+      "",
 
-    fecha: fecha,
+    gl:
+      p?.goals?.home ?? null,
 
-    estado: estado,
-
-    gl: gl,
-
-    gv: gv,
+    gv:
+      p?.goals?.away ?? null,
 
     pais:
-      valor(league,"country","pais") ||
-      valor(p,"country","pais") ||
+      p?.league?.country ??
+      p?.country ??
       "Otros",
 
     liga:
-      valor(league,"name","nombre") ||
-      valor(p,"leagueName","nombreLiga") ||
-      "Sin liga",
+      p?.league?.name ??
+      p?.league ??
+      "Otros"
 
-    // Guardamos datos disponibles para el motor de pronósticos
-    datosOriginales: p
   };
 }
 
-function fechaBonita(fecha){
 
-  if(!fecha) return "";
+/* =====================================================
+   FECHA
+===================================================== */
 
-  const d=new Date(fecha);
+function esEnVivo(p){
+  const estados = [
+    "1H","2H","HT","ET","BT",
+    "P","LIVE","INT","2H",
+    "Q1","Q2","Q3","Q4"
+  ];
 
-  if(isNaN(d.getTime()))
-    return escapar(fecha);
+  return estados.includes(texto(p.estado).toUpperCase());
+}
 
-  return d.toLocaleString("es-ES",{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric",
+function formatoHora(fecha){
+
+  if(!fecha) return "--:--";
+
+  const d = new Date(fecha);
+
+  if(isNaN(d.getTime())) return "--:--";
+
+  return d.toLocaleTimeString([],{
     hour:"2-digit",
     minute:"2-digit"
   });
 }
 
-function esEnVivo(p){
+function esHoy(fecha){
 
-  const e=String(p.estado||"").toUpperCase();
+  if(!fecha) return false;
 
-  return [
-    "1H",
-    "2H",
-    "HT",
-    "ET",
-    "P",
-    "LIVE",
-    "IN_PLAY",
-    "Q1",
-    "Q2",
-    "Q3",
-    "Q4"
-  ].includes(e)
-  || e.includes("LIVE")
-  || e.includes("EN VIVO");
-}
+  const d = new Date(fecha);
+  const ahora = new Date();
 
-function esHoy(p){
-
-  if(esEnVivo(p)) return true;
-
-  if(!p.fecha) return false;
-
-  const d=new Date(p.fecha);
-  const ahora=new Date();
-
-  return d.getFullYear()===ahora.getFullYear()
-    && d.getMonth()===ahora.getMonth()
-    && d.getDate()===ahora.getDate();
-}
-
-function ordenarPartidos(a,b){
-
-  return new Date(a.fecha||0)-new Date(b.fecha||0);
-}
-
-function crearEstructura(lista,tipo){
-
-  const cont=document.getElementById(tipo);
-
-  if(!lista.length){
-
-    cont.innerHTML=
-      '<div class="vacio">⚽ No hay partidos disponibles.</div>';
-
-    return;
-  }
-
-  const paises={};
-
-  lista.forEach(p=>{
-
-    if(!paises[p.pais])
-      paises[p.pais]={};
-
-    if(!paises[p.pais][p.liga])
-      paises[p.pais][p.liga]=[];
-
-    paises[p.pais][p.liga].push(p);
-  });
-
-  let html="";
-
-  Object.keys(paises).sort().forEach(pais=>{
-
-    html+=`
-      <div class="pais">
-
-        <button class="paisTitulo" onclick="abrirCerrar(this)">
-          <span>🌎 ${escapar(pais)}</span>
-          <span>▼</span>
-        </button>
-
-        <div class="contenidoPais">
-    `;
-
-    Object.keys(paises[pais]).sort().forEach(liga=>{
-
-      const listaLiga=
-        paises[pais][liga].sort(ordenarPartidos);
-
-      html+=`
-        <div class="liga">
-
-          <button class="ligaTitulo" onclick="abrirCerrar(this)">
-            <span>🏆 ${escapar(liga)}</span>
-            <span>${listaLiga.length} ⚽ ▼</span>
-          </button>
-
-          <div class="partidos">
-      `;
-
-      listaLiga.forEach(p=>{
-        html+=crearPartido(p);
-      });
-
-      html+=`
-          </div>
-        </div>
-      `;
-    });
-
-    html+=`
-        </div>
-      </div>
-    `;
-  });
-
-  cont.innerHTML=html;
-}
-
-function crearPartido(p){
-
-  const vivo=esEnVivo(p);
-
-  let estadoHTML=vivo
-    ? `<span class="estadoPartido">🔴 EN VIVO</span>`
-    : `<span class="estadoPartido">⚽ PARTIDO</span>`;
-
-  let marcador="";
-
-  if(p.gl!==null || p.gv!==null){
-
-    marcador=`
-      <div class="marcador">
-        ${p.gl ?? "-"} - ${p.gv ?? "-"}
-      </div>
-    `;
-  }
-
-  /*
-    Enviamos al motor:
-    - equipos
-    - fixture ID
-    - liga
-    - país
-    - fecha
-    - datos originales disponibles
-  */
-
-  const informacion=encodeURIComponent(
-    JSON.stringify({
-      fixtureId:p.fixtureId,
-      home:p.local,
-      away:p.visitante,
-      fecha:p.fecha,
-      estado:p.estado,
-      pais:p.pais,
-      liga:p.liga,
-      datos:p.datosOriginales
-    })
+  return (
+    d.getFullYear() === ahora.getFullYear() &&
+    d.getMonth() === ahora.getMonth() &&
+    d.getDate() === ahora.getDate()
   );
-
-  return `
-    <div class="partido"
-      id="partido-${encodeURIComponent(p.id)}">
-
-      <div class="cabeceraPartido">
-
-        ${estadoHTML}
-
-      </div>
-
-      <div class="fecha">
-        📅 ${fechaBonita(p.fecha)}
-      </div>
-
-      <div class="equipos">
-
-        ${escapar(p.local)}
-
-        <div class="vs">VS</div>
-
-        ${escapar(p.visitante)}
-
-      </div>
-
-      ${marcador}
-
-      <button
-        class="predBtn"
-        onclick="togglePrediccion(
-          this,
-          '${informacion}'
-        )">
-
-        🔮 PRONÓSTICOS
-
-      </button>
-
-      <div class="predPanel"></div>
-
-    </div>
-  `;
 }
 
-function abrirCerrar(btn){
 
-  const contenido=btn.nextElementSibling;
+/* =====================================================
+   PREDICCIONES
+===================================================== */
 
-  const abierto=
-    contenido.style.display!=="none";
+function cacheKey(p){
 
-  contenido.style.display=
-    abierto?"none":"block";
+  return "yoger_pred_" +
+    p.id + "_" +
+    p.local + "_" +
+    p.visitante;
 
-  const flecha=
-    btn.querySelector("span:last-child");
-
-  if(flecha){
-
-    const texto=flecha.textContent;
-
-    flecha.textContent=
-      texto.replace(
-        abierto?"▼":"▲",
-        abierto?"▲":"▼"
-      );
-  }
 }
 
-function mostrarSeccion(tipo){
-
-  document
-    .querySelectorAll(".seccion")
-    .forEach(x=>x.classList.remove("active"));
-
-  document
-    .getElementById(tipo)
-    .classList.add("active");
-
-  document
-    .querySelectorAll(".tabs button")
-    .forEach(x=>x.classList.remove("active"));
-
-  if(tipo==="vivo")
-    document
-      .getElementById("tabVivo")
-      .classList.add("active");
-
-  if(tipo==="hoy")
-    document
-      .getElementById("tabHoy")
-      .classList.add("active");
-
-  if(tipo==="proximos")
-    document
-      .getElementById("tabProx")
-      .classList.add("active");
-}
-
-function pct(v){
-
-  if(
-    v===null ||
-    v===undefined ||
-    v==="" ||
-    isNaN(Number(v))
-  )
-    return "—";
-
-  return Number(v).toFixed(1)+"%";
-}
-
-function mostrarOpcion(nombre,valorPct){
-
-  return `
-    <div class="opcion">
-
-      ${escapar(nombre)}
-
-      <span class="porcentaje">
-        ${pct(valorPct)}
-      </span>
-
-    </div>
-  `;
-}
-
-function pintarPrediccion(panel,data){
-
-  const pr=data?.predictions;
-
-  if(!pr){
-
-    panel.innerHTML=
-      '<div class="sinDatos">⚠️ No hay datos de pronóstico disponibles.</div>';
-
-    return;
-  }
-
-  let html=`
-    <div class="predTitulo">
-      🔮 ${pr.estado==="consenso_calculado"
-        ? "CONSENSO YOGER"
-        : "MODELO YOGER"}
-    </div>
-  `;
-
-  if(pr.unoXdos){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          ⚽ 1X2
-        </div>
-
-        <div class="opciones">
-
-          ${mostrarOpcion(
-            "Local",
-            pr.unoXdos.local
-          )}
-
-          ${mostrarOpcion(
-            "Empate",
-            pr.unoXdos.empate
-          )}
-
-          ${mostrarOpcion(
-            "Visitante",
-            pr.unoXdos.visitante
-          )}
-
-        </div>
-      </div>
-    `;
-  }
-
-  if(pr.goles){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          ⚽ GOLES
-        </div>
-
-        <div class="opciones">
-
-          ${mostrarOpcion(
-            "Más 1.5",
-            pr.goles.mas15
-          )}
-
-          ${mostrarOpcion(
-            "Menos 3.5",
-            pr.goles.menos35
-          )}
-
-        </div>
-      </div>
-    `;
-  }
-
-  if(pr.btts){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          ⚽ BTTS
-        </div>
-
-        <div class="opciones">
-
-          ${mostrarOpcion(
-            "Sí",
-            pr.btts.si
-          )}
-
-          ${mostrarOpcion(
-            "No",
-            pr.btts.no
-          )}
-
-        </div>
-      </div>
-    `;
-  }
-
-  if(pr.corners){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          ⚽ CÓRNERS
-        </div>
-
-        <div class="opciones">
-
-          ${mostrarOpcion(
-            "+6.5",
-            pr.corners.mas65
-          )}
-
-          ${mostrarOpcion(
-            "-11.5",
-            pr.corners.menos115
-          )}
-
-        </div>
-      </div>
-    `;
-  }
-
-  if(pr.tarjetas){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          🟨 TARJETAS
-        </div>
-
-        <div class="opciones">
-
-          ${mostrarOpcion(
-            "+3.5",
-            pr.tarjetas.mas35
-          )}
-
-          ${mostrarOpcion(
-            "-5.5",
-            pr.tarjetas.menos55
-          )}
-
-        </div>
-      </div>
-    `;
-  }
-
-  if(
-    Array.isArray(pr.otros) &&
-    pr.otros.length
-  ){
-
-    html+=`
-      <div class="mercado">
-
-        <div class="mercadoTitulo">
-          📊 OTROS MERCADOS
-        </div>
-    `;
-
-    pr.otros.forEach(o=>{
-
-      html+=`
-        <div class="otro">
-
-          <span>
-            ${escapar(o.mercado)}
-            —
-            ${escapar(o.opcion)}
-          </span>
-
-          <strong>
-            ${pct(o.porcentaje)}
-          </strong>
-
-        </div>
-      `;
-    });
-
-    html+=`
-      </div>
-    `;
-  }
-
-  if(
-    Array.isArray(pr.fuentes) &&
-    pr.fuentes.length
-  ){
-
-    html+=`
-      <div class="fuentes">
-
-        📚 Fuentes:
-        ${pr.fuentes.map(escapar).join(", ")}
-
-      </div>
-    `;
-  }
-
-  if(pr.metodologia){
-
-    html+=`
-      <div class="fuentes">
-
-        🧠 ${escapar(pr.metodologia)}
-
-      </div>
-    `;
-  }
-
-  panel.innerHTML=html;
-}
-
-async function togglePrediccion(btn,informacion){
-
-  const panel=btn.nextElementSibling;
-
-  if(panel.classList.contains("abierto")){
-
-    panel.classList.remove("abierto");
-
-    return;
-  }
-
-  panel.classList.add("abierto");
-
-  let partido;
+function leerCache(p){
 
   try{
 
-    partido=
-      JSON.parse(
-        decodeURIComponent(informacion)
-      );
+    const guardado =
+      localStorage.getItem(cacheKey(p));
 
-  }catch(error){
+    if(!guardado) return null;
 
-    panel.innerHTML=
-      '<div class="sinDatos">⚠️ Datos del partido inválidos.</div>';
+    const obj = JSON.parse(guardado);
+
+    /*
+     * Guardamos máximo 6 horas.
+     */
+
+    if(
+      Date.now() - obj.timestamp >
+      6 * 60 * 60 * 1000
+    ){
+
+      localStorage.removeItem(cacheKey(p));
+      return null;
+
+    }
+
+    return obj.data;
+
+  }catch(e){
+
+    return null;
+
+  }
+
+}
+
+function guardarCache(p,data){
+
+  try{
+
+    localStorage.setItem(
+      cacheKey(p),
+      JSON.stringify({
+        timestamp:Date.now(),
+        data:data
+      })
+    );
+
+  }catch(e){}
+
+}
+
+
+/* =====================================================
+   MOSTRAR PREDICCIÓN
+===================================================== */
+
+function porcentaje(valor){
+
+  if(valor === null || valor === undefined || valor === ""){
+    return "—";
+  }
+
+  const n = Number(
+    String(valor).replace("%","").trim()
+  );
+
+  if(!Number.isFinite(n)){
+    return esc(valor);
+  }
+
+  return n.toFixed(1) + "%";
+}
+
+
+function mostrarPrediccion(contenedor,data,p){
+
+  if(!data){
+
+    contenedor.innerHTML =
+      `<div class="sin-datos">
+        ⚠️ No hay predicción disponible para este partido.
+      </div>`;
 
     return;
+
   }
 
   /*
-    La clave ahora incluye fixture ID.
-    Así dos partidos entre los mismos equipos
-    no se mezclan.
-  */
+   * Nuestro endpoint devuelve:
+   *
+   * predictions.unoXdos
+   * predictions.btts
+   * predictions.underOver
+   * predictions.winner
+   * predictions.advice
+   * predictions.goles
+   */
 
-  const clave=
-    String(partido.fixtureId || "")
-    +"|"
-    +String(partido.home)
-    +"|"
-    +String(partido.away)
-    +"|"
-    +String(partido.fecha || "");
+  const pred =
+    data.predictions || {};
 
-  if(cachePred[clave]){
+  const uno =
+    pred.unoXdos || {};
 
-    pintarPrediccion(
-      panel,
-      cachePred[clave]
+  const btts =
+    pred.btts || {};
+
+  const goles =
+    pred.goles || {};
+
+  const local =
+    uno.local ?? null;
+
+  const empate =
+    uno.empate ?? null;
+
+  const visitante =
+    uno.visitante ?? null;
+
+  const ganador =
+    pred.winner?.name ?? null;
+
+  const advice =
+    pred.advice ?? null;
+
+  const underOver =
+    pred.underOver ??
+    pred.under_over ??
+    null;
+
+  const golesLocal =
+    goles.local ?? null;
+
+  const golesVisitante =
+    goles.visitante ?? null;
+
+
+  contenedor.innerHTML = `
+
+    <div class="pred-titulo">
+      🔮 PRONÓSTICO API-FOOTBALL
+    </div>
+
+    <div class="grid-pred">
+
+      <div class="pred-box">
+        <small>${esc(p.local)}</small>
+        <strong>${porcentaje(local)}</strong>
+      </div>
+
+      <div class="pred-box">
+        <small>EMPATE</small>
+        <strong>${porcentaje(empate)}</strong>
+      </div>
+
+      <div class="pred-box">
+        <small>${esc(p.visitante)}</small>
+        <strong>${porcentaje(visitante)}</strong>
+      </div>
+
+    </div>
+
+    <div class="pred-line">
+      <span>🎯 BTTS Sí</span>
+      <strong>${porcentaje(btts.si)}</strong>
+    </div>
+
+    <div class="pred-line">
+      <span>🚫 BTTS No</span>
+      <strong>${porcentaje(btts.no)}</strong>
+    </div>
+
+    <div class="pred-line">
+      <span>⚽ Goles ${esc(p.local)}</span>
+      <strong>${golesLocal !== null ? esc(golesLocal) : "—"}</strong>
+    </div>
+
+    <div class="pred-line">
+      <span>⚽ Goles ${esc(p.visitante)}</span>
+      <strong>${golesVisitante !== null ? esc(golesVisitante) : "—"}</strong>
+    </div>
+
+    <div class="pred-line">
+      <span>📊 Under / Over</span>
+      <strong>${underOver ? esc(underOver) : "—"}</strong>
+    </div>
+
+    <div class="pred-line">
+      <span>🏆 Ganador</span>
+      <strong>${ganador ? esc(ganador) : "—"}</strong>
+    </div>
+
+    ${
+      advice
+      ?
+      `<div class="consejo">
+        💡 ${esc(advice)}
+      </div>`
+      :
+      ""
+    }
+
+  `;
+
+}
+
+
+/* =====================================================
+   BOTÓN PREDICCIÓN
+===================================================== */
+
+async function cargarPrediccion(btn,p){
+
+  const caja =
+    document.getElementById(
+      "pred-" + p.id
+    );
+
+  if(!caja) return;
+
+  /*
+   * Si ya está visible, cerrar.
+   */
+
+  if(caja.classList.contains("visible")){
+
+    caja.classList.remove("visible");
+    return;
+
+  }
+
+  caja.classList.add("visible");
+
+  /*
+   * Buscar primero en caché.
+   */
+
+  const cache =
+    leerCache(p);
+
+  if(cache){
+
+    mostrarPrediccion(
+      caja,
+      cache,
+      p
     );
 
     return;
+
   }
 
-  panel.innerHTML=
-    '<div class="cargandoPred">🔄 Analizando partido...</div>';
+  caja.innerHTML =
+    `<div class="cargando">
+      🔄 Consultando pronóstico...
+    </div>`;
+
+  btn.disabled = true;
 
   try{
 
-    const url=
-      "/api/predictions?"
-      +"home="
-      +encodeURIComponent(partido.home)
-      +"&away="
-      +encodeURIComponent(partido.away)
-      +"&fixtureId="
-      +encodeURIComponent(partido.fixtureId || "")
-      +"&league="
-      +encodeURIComponent(partido.liga || "")
-      +"&country="
-      +encodeURIComponent(partido.pais || "")
-      +"&date="
-      +encodeURIComponent(partido.fecha || "");
+    const params =
+      new URLSearchParams({
 
-    const respuesta=
-      await fetch(url);
+        fixtureId:String(p.id),
 
-    if(!respuesta.ok)
-      throw new Error(
-        "HTTP "+respuesta.status
+        home:p.local,
+
+        away:p.visitante,
+
+        league:p.liga,
+
+        country:p.pais
+
+      });
+
+    const respuesta =
+      await fetch(
+        PRED_URL + "?" + params.toString()
       );
 
-    const data=
+    const data =
       await respuesta.json();
 
-    cachePred[clave]=data;
+    if(!respuesta.ok){
 
-    pintarPrediccion(
-      panel,
-      data
+      throw new Error(
+        data?.error
+        ?
+        JSON.stringify(data.error)
+        :
+        "Error HTTP " + respuesta.status
+      );
+
+    }
+
+    /*
+     * Guardamos solamente si realmente
+     * hay una respuesta válida.
+     */
+
+    if(data?.disponible !== false){
+
+      guardarCache(
+        p,
+        data
+      );
+
+    }
+
+    mostrarPrediccion(
+      caja,
+      data,
+      p
     );
 
   }catch(error){
 
     console.error(
-      "Error pronóstico:",
+      "Error predicción:",
       error
     );
 
-    panel.innerHTML=`
-      <div class="sinDatos">
-        ⚠️ No se pudo calcular el pronóstico.
-      </div>
-    `;
+    caja.innerHTML =
+      `<div class="sin-datos">
+        ⚠️ No se pudo cargar el pronóstico.<br>
+        <small>${esc(error.message)}</small>
+      </div>`;
+
   }
+
+  btn.disabled = false;
+
 }
+
+
+/* =====================================================
+   PARTIDO
+===================================================== */
+
+function crearPartido(p){
+
+  const vivo =
+    esEnVivo(p);
+
+  const marcador =
+    vivo &&
+    p.gl !== null &&
+    p.gv !== null
+    ?
+    `<div class="marcador">
+      ${esc(p.gl)} - ${esc(p.gv)}
+    </div>`
+    :
+    "";
+
+  return `
+
+    <div class="partido">
+
+      <div class="info-partido">
+
+        <span>
+          ${
+            vivo
+            ?
+            `<span class="en-vivo">🔴 EN VIVO</span>`
+            :
+            `📅 ${formatoHora(p.fecha)}`
+          }
+        </span>
+
+        <span>
+          ID: ${esc(p.id)}
+        </span>
+
+      </div>
+
+      <div class="equipos">
+
+        ${esc(p.local)}
+
+        <div class="vs">VS</div>
+
+        ${esc(p.visitante)}
+
+      </div>
+
+      ${marcador}
+
+      ${
+        p.id
+        ?
+        `
+        <button
+          class="boton-pred"
+          onclick='cargarPrediccion(this, ${JSON.stringify(p)})'
+        >
+          🔮 PRONÓSTICOS
+        </button>
+
+        <div
+          id="pred-${esc(p.id)}"
+          class="prediccion"
+        ></div>
+        `
+        :
+        `
+        <div class="sin-datos">
+          Pronóstico no disponible
+        </div>
+        `
+      }
+
+    </div>
+
+  `;
+
+}
+
+
+/* =====================================================
+   AGRUPAR POR PAÍS → LIGA
+===================================================== */
+
+function agrupar(partidos){
+
+  const paises = {};
+
+  partidos.forEach(p=>{
+
+    const pais =
+      p.pais || "Otros";
+
+    const liga =
+      p.liga || "Otros";
+
+    if(!paises[pais]){
+      paises[pais] = {};
+    }
+
+    if(!paises[pais][liga]){
+      paises[pais][liga] = [];
+    }
+
+    paises[pais][liga].push(p);
+
+  });
+
+  return paises;
+
+}
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderSeccion(
+  contenedorId,
+  partidos,
+  vacioTexto
+){
+
+  const contenedor =
+    document.getElementById(
+      contenedorId
+    );
+
+  if(!partidos.length){
+
+    contenedor.innerHTML =
+      `<div class="vacio">
+        ${vacioTexto}
+      </div>`;
+
+    return;
+
+  }
+
+  const grupos =
+    agrupar(partidos);
+
+  let html = "";
+
+  Object.keys(grupos)
+    .sort((a,b)=>a.localeCompare(b))
+    .forEach((pais,indexPais)=>{
+
+      const ligas =
+        grupos[pais];
+
+      let ligasHtml = "";
+
+      Object.keys(ligas)
+        .sort((a,b)=>a.localeCompare(b))
+        .forEach((liga,indexLiga)=>{
+
+          const lista =
+            ligas[liga];
+
+          ligasHtml += `
+
+            <div class="liga">
+
+              <div
+                class="liga-titulo"
+                onclick="this.parentElement.classList.toggle('abierta')"
+              >
+
+                <span>
+                  ⚽ ${esc(liga)}
+                  <small>
+                    (${lista.length})
+                  </small>
+                </span>
+
+                <span class="flecha">
+                  ▼
+                </span>
+
+              </div>
+
+              <div class="liga-contenido">
+
+                ${lista.map(crearPartido).join("")}
+
+              </div>
+
+            </div>
+
+          `;
+
+        });
+
+      html += `
+
+        <div class="pais">
+
+          <div
+            class="pais-titulo"
+            onclick="this.parentElement.classList.toggle('abierto')"
+          >
+
+            <span>
+              🌎 ${esc(pais)}
+            </span>
+
+            <span>
+              ${Object.values(ligas)
+                .reduce((total,arr)=>total+arr.length,0)}
+              partidos
+            </span>
+
+          </div>
+
+          <div class="pais-contenido">
+            ${ligasHtml}
+          </div>
+
+        </div>
+
+      `;
+
+    });
+
+  contenedor.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   CARGAR PARTIDOS
+===================================================== */
 
 async function cargarPartidos(){
 
-  const estado=
-    document.getElementById("estado");
-
-  estado.textContent=
-    "🔄 Cargando partidos...";
+  const estado =
+    document.getElementById("estadoApi");
 
   try{
 
-    const respuesta=
+    estado.textContent =
+      "🔄 Actualizando partidos...";
+
+    const respuesta =
       await fetch(
-        "/api/football?"+Date.now()
+        API_URL + "?t=" + Date.now()
       );
 
-    if(!respuesta.ok)
-      throw new Error(
-        "HTTP "+respuesta.status
-      );
-
-    const json=
+    const data =
       await respuesta.json();
 
-    let todos=[];
+    if(!respuesta.ok || data.success === false){
 
-    if(Array.isArray(json.partidos))
-      todos=json.partidos;
+      throw new Error(
+        data.error ||
+        "No se pudieron cargar los partidos"
+      );
 
-    else{
-
-      if(Array.isArray(json.enVivo))
-        todos=
-          todos.concat(json.enVivo);
-
-      if(Array.isArray(json.partidosHoy))
-        todos=
-          todos.concat(json.partidosHoy);
-
-      if(Array.isArray(json.partidosManana))
-        todos=
-          todos.concat(json.partidosManana);
     }
 
-    const mapa=new Map();
+    datosGlobales = data;
 
-    todos.forEach(x=>{
+    const todos =
+      Array.isArray(data.partidos)
+      ?
+      data.partidos
+      :
+      [
+        ...(data.enVivo || []),
+        ...(data.partidosHoy || []),
+        ...(data.partidosManana || [])
+      ];
 
-      const p=
-        obtenerPartido(x);
+    const partidos =
+      todos.map(obtenerPartido)
+        .filter(p=>p.id !== null);
 
-      mapa.set(
-        String(p.id),
-        p
-      );
-    });
+    const vivo =
+      partidos.filter(esEnVivo);
 
-    datos=
-      Array.from(mapa.values());
-
-    const vivos=
-      datos.filter(esEnVivo);
-
-    const hoy=
-      datos.filter(
-        p=>esHoy(p) && !esEnVivo(p)
-      );
-
-    const proximos=
-      datos.filter(
-        p=>!esHoy(p) && !esEnVivo(p)
+    const hoy =
+      partidos.filter(p=>
+        !esEnVivo(p) &&
+        esHoy(p.fecha)
       );
 
-    crearEstructura(
-      vivos,
-      "vivo"
+    const proximos =
+      partidos.filter(p=>
+        !esEnVivo(p) &&
+        !esHoy(p.fecha)
+      );
+
+    document.getElementById(
+      "contadorVivo"
+    ).textContent = vivo.length;
+
+    document.getElementById(
+      "contadorHoy"
+    ).textContent = hoy.length;
+
+    document.getElementById(
+      "contadorProximos"
+    ).textContent = proximos.length;
+
+    renderSeccion(
+      "vivo",
+      vivo,
+      "No hay partidos en vivo en este momento."
     );
 
-    crearEstructura(
+    renderSeccion(
+      "hoy",
       hoy,
-      "hoy"
+      "No hay partidos programados para hoy."
     );
 
-    crearEstructura(
+    renderSeccion(
+      "proximos",
       proximos,
-      "proximos"
+      "No hay próximos partidos disponibles."
     );
 
-    estado.textContent=
-      `⚽ ${datos.length} partidos · `
-      +`🔴 ${vivos.length} en vivo · `
-      +`📅 ${hoy.length} hoy · `
-      +`⏭️ ${proximos.length} próximos`;
+    estado.textContent =
+      `✅ ${partidos.length} partidos cargados`;
 
   }catch(error){
 
     console.error(error);
 
-    estado.textContent=
-      "⚠️ Error cargando los partidos.";
+    estado.textContent =
+      "❌ Error cargando los partidos";
 
-    [
-      "vivo",
-      "hoy",
-      "proximos"
-    ].forEach(id=>{
+    document.getElementById("vivo").innerHTML =
+      `<div class="vacio">
+        No se pudieron cargar los partidos.
+      </div>`;
 
-      document.getElementById(id).innerHTML=
-        '<div class="vacio">⚠️ No se pudieron cargar los partidos.</div>';
-
-    });
   }
+
 }
 
+
+/* =====================================================
+   INICIO
+===================================================== */
+
 cargarPartidos();
+
+/*
+ * Actualizar cada 60 segundos.
+ */
 
 setInterval(
   cargarPartidos,
@@ -1117,4 +1194,4 @@ setInterval(
 </script>
 
 </body>
-</html>
+  </html>
