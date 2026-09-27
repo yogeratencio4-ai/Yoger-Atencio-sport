@@ -275,7 +275,8 @@ function escapar(t){
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;");
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 function valor(obj,...claves){
@@ -287,6 +288,7 @@ function valor(obj,...claves){
 }
 
 function obtenerPartido(p){
+
   const fixture=valor(p,"fixture") || {};
   const partido=valor(p,"partido") || {};
 
@@ -323,23 +325,53 @@ function obtenerPartido(p){
   const gl=valor(goles,"home","local","locales");
   const gv=valor(goles,"away","visitante","visitantes");
 
+  const fixtureId=
+    valor(fixture,"id") ||
+    valor(p,"fixtureId") ||
+    valor(p,"id") ||
+    null;
+
   return {
-    id: valor(fixture,"id") || valor(p,"id") || (local+"-"+visitante+"-"+fecha),
-    local,
-    visitante,
-    fecha,
-    estado,
-    gl,
-    gv,
-    pais: valor(league,"country","pais") || valor(p,"country","pais") || "Otros",
-    liga: valor(league,"name","nombre") || valor(p,"leagueName","nombreLiga") || "Sin liga"
+
+    id: fixtureId || (local+"-"+visitante+"-"+fecha),
+
+    fixtureId: fixtureId,
+
+    local: local,
+
+    visitante: visitante,
+
+    fecha: fecha,
+
+    estado: estado,
+
+    gl: gl,
+
+    gv: gv,
+
+    pais:
+      valor(league,"country","pais") ||
+      valor(p,"country","pais") ||
+      "Otros",
+
+    liga:
+      valor(league,"name","nombre") ||
+      valor(p,"leagueName","nombreLiga") ||
+      "Sin liga",
+
+    // Guardamos datos disponibles para el motor de pronósticos
+    datosOriginales: p
   };
 }
 
 function fechaBonita(fecha){
+
   if(!fecha) return "";
+
   const d=new Date(fecha);
-  if(isNaN(d.getTime())) return escapar(fecha);
+
+  if(isNaN(d.getTime()))
+    return escapar(fecha);
 
   return d.toLocaleString("es-ES",{
     day:"2-digit",
@@ -351,14 +383,30 @@ function fechaBonita(fecha){
 }
 
 function esEnVivo(p){
+
   const e=String(p.estado||"").toUpperCase();
-  return ["1H","2H","HT","ET","P","LIVE","IN_PLAY","Q1","Q2","Q3","Q4"].includes(e)
-    || e.includes("LIVE")
-    || e.includes("EN VIVO");
+
+  return [
+    "1H",
+    "2H",
+    "HT",
+    "ET",
+    "P",
+    "LIVE",
+    "IN_PLAY",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4"
+  ].includes(e)
+  || e.includes("LIVE")
+  || e.includes("EN VIVO");
 }
 
 function esHoy(p){
+
   if(esEnVivo(p)) return true;
+
   if(!p.fecha) return false;
 
   const d=new Date(p.fecha);
@@ -370,6 +418,7 @@ function esHoy(p){
 }
 
 function ordenarPartidos(a,b){
+
   return new Date(a.fecha||0)-new Date(b.fecha||0);
 }
 
@@ -378,15 +427,23 @@ function crearEstructura(lista,tipo){
   const cont=document.getElementById(tipo);
 
   if(!lista.length){
-    cont.innerHTML='<div class="vacio">⚽ No hay partidos disponibles.</div>';
+
+    cont.innerHTML=
+      '<div class="vacio">⚽ No hay partidos disponibles.</div>';
+
     return;
   }
 
   const paises={};
 
   lista.forEach(p=>{
-    if(!paises[p.pais]) paises[p.pais]={};
-    if(!paises[p.pais][p.liga]) paises[p.pais][p.liga]=[];
+
+    if(!paises[p.pais])
+      paises[p.pais]={};
+
+    if(!paises[p.pais][p.liga])
+      paises[p.pais][p.liga]=[];
+
     paises[p.pais][p.liga].push(p);
   });
 
@@ -396,19 +453,23 @@ function crearEstructura(lista,tipo){
 
     html+=`
       <div class="pais">
+
         <button class="paisTitulo" onclick="abrirCerrar(this)">
           <span>🌎 ${escapar(pais)}</span>
           <span>▼</span>
         </button>
+
         <div class="contenidoPais">
     `;
 
     Object.keys(paises[pais]).sort().forEach(liga=>{
 
-      const listaLiga=paises[pais][liga].sort(ordenarPartidos);
+      const listaLiga=
+        paises[pais][liga].sort(ordenarPartidos);
 
       html+=`
         <div class="liga">
+
           <button class="ligaTitulo" onclick="abrirCerrar(this)">
             <span>🏆 ${escapar(liga)}</span>
             <span>${listaLiga.length} ⚽ ▼</span>
@@ -447,15 +508,45 @@ function crearPartido(p){
   let marcador="";
 
   if(p.gl!==null || p.gv!==null){
-    marcador=`<div class="marcador">${p.gl ?? "-"} - ${p.gv ?? "-"}</div>`;
+
+    marcador=`
+      <div class="marcador">
+        ${p.gl ?? "-"} - ${p.gv ?? "-"}
+      </div>
+    `;
   }
 
+  /*
+    Enviamos al motor:
+    - equipos
+    - fixture ID
+    - liga
+    - país
+    - fecha
+    - datos originales disponibles
+  */
+
+  const informacion=encodeURIComponent(
+    JSON.stringify({
+      fixtureId:p.fixtureId,
+      home:p.local,
+      away:p.visitante,
+      fecha:p.fecha,
+      estado:p.estado,
+      pais:p.pais,
+      liga:p.liga,
+      datos:p.datosOriginales
+    })
+  );
+
   return `
-    <div class="partido" id="partido-${encodeURIComponent(p.id)}">
+    <div class="partido"
+      id="partido-${encodeURIComponent(p.id)}">
 
       <div class="cabeceraPartido">
+
         ${estadoHTML}
-        <span style="font-size:10px;color:#91a399">${escapar(p.id)}</span>
+
       </div>
 
       <div class="fecha">
@@ -463,16 +554,26 @@ function crearPartido(p){
       </div>
 
       <div class="equipos">
+
         ${escapar(p.local)}
+
         <div class="vs">VS</div>
+
         ${escapar(p.visitante)}
+
       </div>
 
       ${marcador}
 
-      <button class="predBtn"
-        onclick="togglePrediccion(this,'${encodeURIComponent(p.local)}','${encodeURIComponent(p.visitante)}')">
+      <button
+        class="predBtn"
+        onclick="togglePrediccion(
+          this,
+          '${informacion}'
+        )">
+
         🔮 PRONÓSTICOS
+
       </button>
 
       <div class="predPanel"></div>
@@ -484,39 +585,82 @@ function crearPartido(p){
 function abrirCerrar(btn){
 
   const contenido=btn.nextElementSibling;
-  const abierto=contenido.style.display!=="none";
 
-  contenido.style.display=abierto?"none":"block";
+  const abierto=
+    contenido.style.display!=="none";
 
-  const flecha=btn.querySelector("span:last-child");
+  contenido.style.display=
+    abierto?"none":"block";
+
+  const flecha=
+    btn.querySelector("span:last-child");
+
   if(flecha){
+
     const texto=flecha.textContent;
-    flecha.textContent=texto.replace(abierto?"▼":"▲",abierto?"▲":"▼");
+
+    flecha.textContent=
+      texto.replace(
+        abierto?"▼":"▲",
+        abierto?"▲":"▼"
+      );
   }
 }
 
 function mostrarSeccion(tipo){
 
-  document.querySelectorAll(".seccion").forEach(x=>x.classList.remove("active"));
-  document.getElementById(tipo).classList.add("active");
+  document
+    .querySelectorAll(".seccion")
+    .forEach(x=>x.classList.remove("active"));
 
-  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+  document
+    .getElementById(tipo)
+    .classList.add("active");
 
-  if(tipo==="vivo") document.getElementById("tabVivo").classList.add("active");
-  if(tipo==="hoy") document.getElementById("tabHoy").classList.add("active");
-  if(tipo==="proximos") document.getElementById("tabProx").classList.add("active");
+  document
+    .querySelectorAll(".tabs button")
+    .forEach(x=>x.classList.remove("active"));
+
+  if(tipo==="vivo")
+    document
+      .getElementById("tabVivo")
+      .classList.add("active");
+
+  if(tipo==="hoy")
+    document
+      .getElementById("tabHoy")
+      .classList.add("active");
+
+  if(tipo==="proximos")
+    document
+      .getElementById("tabProx")
+      .classList.add("active");
 }
 
 function pct(v){
-  if(v===null || v===undefined || isNaN(Number(v))) return "—";
+
+  if(
+    v===null ||
+    v===undefined ||
+    v==="" ||
+    isNaN(Number(v))
+  )
+    return "—";
+
   return Number(v).toFixed(1)+"%";
 }
 
 function mostrarOpcion(nombre,valorPct){
+
   return `
     <div class="opcion">
+
       ${escapar(nombre)}
-      <span class="porcentaje">${pct(valorPct)}</span>
+
+      <span class="porcentaje">
+        ${pct(valorPct)}
+      </span>
+
     </div>
   `;
 }
@@ -526,105 +670,215 @@ function pintarPrediccion(panel,data){
   const pr=data?.predictions;
 
   if(!pr){
-    panel.innerHTML='<div class="sinDatos">⚠️ No hay datos de pronóstico disponibles.</div>';
+
+    panel.innerHTML=
+      '<div class="sinDatos">⚠️ No hay datos de pronóstico disponibles.</div>';
+
     return;
   }
 
   let html=`
-    <div class="predTitulo">🔮 CONSENSO YOGER</div>
+    <div class="predTitulo">
+      🔮 ${pr.estado==="consenso_calculado"
+        ? "CONSENSO YOGER"
+        : "MODELO YOGER"}
+    </div>
   `;
 
   if(pr.unoXdos){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">⚽ 1X2</div>
+
+        <div class="mercadoTitulo">
+          ⚽ 1X2
+        </div>
+
         <div class="opciones">
-          ${mostrarOpcion("Local",pr.unoXdos.local)}
-          ${mostrarOpcion("Empate",pr.unoXdos.empate)}
-          ${mostrarOpcion("Visitante",pr.unoXdos.visitante)}
+
+          ${mostrarOpcion(
+            "Local",
+            pr.unoXdos.local
+          )}
+
+          ${mostrarOpcion(
+            "Empate",
+            pr.unoXdos.empate
+          )}
+
+          ${mostrarOpcion(
+            "Visitante",
+            pr.unoXdos.visitante
+          )}
+
         </div>
       </div>
     `;
   }
 
   if(pr.goles){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">⚽ GOLES</div>
+
+        <div class="mercadoTitulo">
+          ⚽ GOLES
+        </div>
+
         <div class="opciones">
-          ${mostrarOpcion("Más 1.5",pr.goles.mas15)}
-          ${mostrarOpcion("Menos 3.5",pr.goles.menos35)}
+
+          ${mostrarOpcion(
+            "Más 1.5",
+            pr.goles.mas15
+          )}
+
+          ${mostrarOpcion(
+            "Menos 3.5",
+            pr.goles.menos35
+          )}
+
         </div>
       </div>
     `;
   }
 
   if(pr.btts){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">⚽ BTTS</div>
+
+        <div class="mercadoTitulo">
+          ⚽ BTTS
+        </div>
+
         <div class="opciones">
-          ${mostrarOpcion("Sí",pr.btts.si)}
-          ${mostrarOpcion("No",pr.btts.no)}
+
+          ${mostrarOpcion(
+            "Sí",
+            pr.btts.si
+          )}
+
+          ${mostrarOpcion(
+            "No",
+            pr.btts.no
+          )}
+
         </div>
       </div>
     `;
   }
 
   if(pr.corners){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">⚽ CÓRNERS</div>
+
+        <div class="mercadoTitulo">
+          ⚽ CÓRNERS
+        </div>
+
         <div class="opciones">
-          ${mostrarOpcion("+6.5",pr.corners.mas65)}
-          ${mostrarOpcion("-11.5",pr.corners.menos115)}
+
+          ${mostrarOpcion(
+            "+6.5",
+            pr.corners.mas65
+          )}
+
+          ${mostrarOpcion(
+            "-11.5",
+            pr.corners.menos115
+          )}
+
         </div>
       </div>
     `;
   }
 
   if(pr.tarjetas){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">🟨 TARJETAS</div>
+
+        <div class="mercadoTitulo">
+          🟨 TARJETAS
+        </div>
+
         <div class="opciones">
-          ${mostrarOpcion("+3.5",pr.tarjetas.mas35)}
-          ${mostrarOpcion("-5.5",pr.tarjetas.menos55)}
+
+          ${mostrarOpcion(
+            "+3.5",
+            pr.tarjetas.mas35
+          )}
+
+          ${mostrarOpcion(
+            "-5.5",
+            pr.tarjetas.menos55
+          )}
+
         </div>
       </div>
     `;
   }
 
-  if(Array.isArray(pr.otros) && pr.otros.length){
+  if(
+    Array.isArray(pr.otros) &&
+    pr.otros.length
+  ){
+
     html+=`
       <div class="mercado">
-        <div class="mercadoTitulo">📊 OTROS MERCADOS</div>
+
+        <div class="mercadoTitulo">
+          📊 OTROS MERCADOS
+        </div>
     `;
 
     pr.otros.forEach(o=>{
+
       html+=`
         <div class="otro">
-          <span>${escapar(o.mercado)} — ${escapar(o.opcion)}</span>
-          <strong>${pct(o.porcentaje)}</strong>
+
+          <span>
+            ${escapar(o.mercado)}
+            —
+            ${escapar(o.opcion)}
+          </span>
+
+          <strong>
+            ${pct(o.porcentaje)}
+          </strong>
+
         </div>
       `;
     });
 
-    html+=`</div>`;
+    html+=`
+      </div>
+    `;
   }
 
-  if(Array.isArray(pr.fuentes) && pr.fuentes.length){
+  if(
+    Array.isArray(pr.fuentes) &&
+    pr.fuentes.length
+  ){
+
     html+=`
       <div class="fuentes">
-        📚 Fuentes: ${pr.fuentes.map(escapar).join(", ")}
+
+        📚 Fuentes:
+        ${pr.fuentes.map(escapar).join(", ")}
+
       </div>
     `;
   }
 
   if(pr.metodologia){
+
     html+=`
       <div class="fuentes">
+
         🧠 ${escapar(pr.metodologia)}
+
       </div>
     `;
   }
@@ -632,52 +886,109 @@ function pintarPrediccion(panel,data){
   panel.innerHTML=html;
 }
 
-async function togglePrediccion(btn,home,away){
+async function togglePrediccion(btn,informacion){
 
   const panel=btn.nextElementSibling;
 
   if(panel.classList.contains("abierto")){
+
     panel.classList.remove("abierto");
+
     return;
   }
 
   panel.classList.add("abierto");
 
-  const local=decodeURIComponent(home);
-  const visitante=decodeURIComponent(away);
-
-  const clave=local+"|"+visitante;
-
-  if(cachePred[clave]){
-    pintarPrediccion(panel,cachePred[clave]);
-    return;
-  }
-
-  panel.innerHTML='<div class="cargandoPred">🔄 Calculando consenso...</div>';
+  let partido;
 
   try{
 
-    const url="/api/predictions?home="
-      +encodeURIComponent(local)
-      +"&away="
-      +encodeURIComponent(visitante);
-
-    const respuesta=await fetch(url);
-
-    if(!respuesta.ok)
-      throw new Error("HTTP "+respuesta.status);
-
-    const data=await respuesta.json();
-
-    cachePred[clave]=data;
-
-    pintarPrediccion(panel,data);
+    partido=
+      JSON.parse(
+        decodeURIComponent(informacion)
+      );
 
   }catch(error){
 
+    panel.innerHTML=
+      '<div class="sinDatos">⚠️ Datos del partido inválidos.</div>';
+
+    return;
+  }
+
+  /*
+    La clave ahora incluye fixture ID.
+    Así dos partidos entre los mismos equipos
+    no se mezclan.
+  */
+
+  const clave=
+    String(partido.fixtureId || "")
+    +"|"
+    +String(partido.home)
+    +"|"
+    +String(partido.away)
+    +"|"
+    +String(partido.fecha || "");
+
+  if(cachePred[clave]){
+
+    pintarPrediccion(
+      panel,
+      cachePred[clave]
+    );
+
+    return;
+  }
+
+  panel.innerHTML=
+    '<div class="cargandoPred">🔄 Analizando partido...</div>';
+
+  try{
+
+    const url=
+      "/api/predictions?"
+      +"home="
+      +encodeURIComponent(partido.home)
+      +"&away="
+      +encodeURIComponent(partido.away)
+      +"&fixtureId="
+      +encodeURIComponent(partido.fixtureId || "")
+      +"&league="
+      +encodeURIComponent(partido.liga || "")
+      +"&country="
+      +encodeURIComponent(partido.pais || "")
+      +"&date="
+      +encodeURIComponent(partido.fecha || "");
+
+    const respuesta=
+      await fetch(url);
+
+    if(!respuesta.ok)
+      throw new Error(
+        "HTTP "+respuesta.status
+      );
+
+    const data=
+      await respuesta.json();
+
+    cachePred[clave]=data;
+
+    pintarPrediccion(
+      panel,
+      data
+    );
+
+  }catch(error){
+
+    console.error(
+      "Error pronóstico:",
+      error
+    );
+
     panel.innerHTML=`
       <div class="sinDatos">
-        ⚠️ No se pudo cargar el pronóstico.
+        ⚠️ No se pudo calcular el pronóstico.
       </div>
     `;
   }
@@ -685,17 +996,26 @@ async function togglePrediccion(btn,home,away){
 
 async function cargarPartidos(){
 
-  const estado=document.getElementById("estado");
-  estado.textContent="🔄 Cargando partidos...";
+  const estado=
+    document.getElementById("estado");
+
+  estado.textContent=
+    "🔄 Cargando partidos...";
 
   try{
 
-    const respuesta=await fetch("/api/football?"+Date.now());
+    const respuesta=
+      await fetch(
+        "/api/football?"+Date.now()
+      );
 
     if(!respuesta.ok)
-      throw new Error("HTTP "+respuesta.status);
+      throw new Error(
+        "HTTP "+respuesta.status
+      );
 
-    const json=await respuesta.json();
+    const json=
+      await respuesta.json();
 
     let todos=[];
 
@@ -705,55 +1025,96 @@ async function cargarPartidos(){
     else{
 
       if(Array.isArray(json.enVivo))
-        todos=todos.concat(json.enVivo);
+        todos=
+          todos.concat(json.enVivo);
 
       if(Array.isArray(json.partidosHoy))
-        todos=todos.concat(json.partidosHoy);
+        todos=
+          todos.concat(json.partidosHoy);
 
       if(Array.isArray(json.partidosManana))
-        todos=todos.concat(json.partidosManana);
+        todos=
+          todos.concat(json.partidosManana);
     }
 
     const mapa=new Map();
 
     todos.forEach(x=>{
-      const p=obtenerPartido(x);
-      mapa.set(String(p.id),p);
+
+      const p=
+        obtenerPartido(x);
+
+      mapa.set(
+        String(p.id),
+        p
+      );
     });
 
-    datos=Array.from(mapa.values());
+    datos=
+      Array.from(mapa.values());
 
-    const vivos=datos.filter(esEnVivo);
+    const vivos=
+      datos.filter(esEnVivo);
 
-    const hoy=datos.filter(p=>esHoy(p) && !esEnVivo(p));
+    const hoy=
+      datos.filter(
+        p=>esHoy(p) && !esEnVivo(p)
+      );
 
-    const proximos=datos.filter(p=>!esHoy(p) && !esEnVivo(p));
+    const proximos=
+      datos.filter(
+        p=>!esHoy(p) && !esEnVivo(p)
+      );
 
-    crearEstructura(vivos,"vivo");
-    crearEstructura(hoy,"hoy");
-    crearEstructura(proximos,"proximos");
+    crearEstructura(
+      vivos,
+      "vivo"
+    );
+
+    crearEstructura(
+      hoy,
+      "hoy"
+    );
+
+    crearEstructura(
+      proximos,
+      "proximos"
+    );
 
     estado.textContent=
-      `⚽ ${datos.length} partidos · 🔴 ${vivos.length} en vivo · 📅 ${hoy.length} hoy · ⏭️ ${proximos.length} próximos`;
+      `⚽ ${datos.length} partidos · `
+      +`🔴 ${vivos.length} en vivo · `
+      +`📅 ${hoy.length} hoy · `
+      +`⏭️ ${proximos.length} próximos`;
 
   }catch(error){
 
     console.error(error);
 
-    estado.textContent="⚠️ Error cargando los partidos.";
+    estado.textContent=
+      "⚠️ Error cargando los partidos.";
 
-    ["vivo","hoy","proximos"].forEach(id=>{
+    [
+      "vivo",
+      "hoy",
+      "proximos"
+    ].forEach(id=>{
+
       document.getElementById(id).innerHTML=
         '<div class="vacio">⚠️ No se pudieron cargar los partidos.</div>';
+
     });
   }
 }
 
 cargarPartidos();
 
-setInterval(cargarPartidos,60000);
+setInterval(
+  cargarPartidos,
+  60000
+);
 
 </script>
 
 </body>
-  </html>
+</html>
