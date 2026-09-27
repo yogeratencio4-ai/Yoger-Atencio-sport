@@ -3,89 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>YOGER ATENCIO SPORT</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
-  background:#06140d;
+  background:#061b14;
   color:#fff;
 }
 
 header{
-  background:linear-gradient(135deg,#073d20,#0b6b35);
-  padding:22px 15px;
+  background:#0b3d2e;
+  padding:18px 12px;
   text-align:center;
-  border-bottom:2px solid #18c66a;
+  border-bottom:2px solid #19c37d;
 }
 
 header h1{
   margin:0;
-  font-size:25px;
+  font-size:24px;
+  color:#19c37d;
 }
 
 header p{
-  margin:7px 0 0;
-  color:#b8ffd5;
+  margin:6px 0 0;
   font-size:13px;
-}
-
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:12px;
-}
-
-.status{
-  text-align:center;
-  background:#0b2417;
-  border:1px solid #174d2e;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:12px;
-  font-size:14px;
+  color:#d8f5e9;
 }
 
 .tabs{
   display:flex;
-  gap:7px;
-  margin-bottom:12px;
+  gap:6px;
+  padding:10px;
+  background:#08251c;
+  position:sticky;
+  top:0;
+  z-index:20;
 }
 
 .tab{
   flex:1;
   border:0;
-  padding:12px 5px;
-  border-radius:9px;
-  background:#10291b;
-  color:#aaa;
+  border-radius:8px;
+  padding:11px 5px;
+  background:#12382b;
+  color:#fff;
   font-weight:bold;
   cursor:pointer;
 }
 
 .tab.active{
-  background:#10a957;
-  color:#fff;
+  background:#19c37d;
+  color:#042016;
 }
 
-.section{display:none}
-.section.active{display:block}
+.container{
+  padding:10px;
+}
+
+.status{
+  text-align:center;
+  margin:8px 0 12px;
+  color:#b8ddce;
+  font-size:13px;
+}
 
 .country{
   margin-bottom:12px;
-  border:1px solid #174d2e;
+  border:1px solid #14523d;
   border-radius:10px;
   overflow:hidden;
-  background:#091c11;
+  background:#09271e;
 }
 
 .country-title{
-  background:#0d3320;
   padding:13px;
-  font-size:17px;
+  background:#0d4634;
+  font-size:16px;
   font-weight:bold;
   cursor:pointer;
   display:flex;
@@ -93,208 +93,162 @@ header p{
   align-items:center;
 }
 
-.country-title span:last-child{
-  color:#7cffae;
-  font-size:13px;
+.country-content{
+  display:block;
+}
+
+.country.closed .country-content{
+  display:none;
 }
 
 .league{
   margin:8px;
-  border:1px solid #1b5735;
+  border:1px solid #185b44;
   border-radius:8px;
   overflow:hidden;
 }
 
 .league-title{
-  background:#10291b;
+  background:#0b382a;
   padding:11px;
+  font-size:14px;
+  font-weight:bold;
   cursor:pointer;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-weight:bold;
 }
 
-.league-name{
-  display:flex;
-  align-items:center;
-  gap:8px;
+.league-content{
+  display:block;
 }
 
-.league-logo{
-  width:25px;
-  height:25px;
-  object-fit:contain;
-}
-
-.matches{
-  padding:5px;
-  background:#07170e;
+.league.closed .league-content{
+  display:none;
 }
 
 .match{
-  background:#0d2517;
-  border:1px solid #163e28;
-  border-radius:8px;
-  margin:6px 0;
-  padding:11px;
+  background:#071d16;
+  border-top:1px solid #123c2e;
+  padding:12px 10px;
 }
 
 .match-top{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  color:#8fd9aa;
-  font-size:11px;
-  margin-bottom:8px;
+  gap:8px;
+  margin-bottom:9px;
 }
 
-.status-live{
-  color:#ff4d4d;
+.match-date{
+  color:#9fd8c1;
+  font-size:12px;
+}
+
+.live{
+  color:#ff5555;
   font-weight:bold;
+  font-size:12px;
 }
 
 .teams{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  gap:8px;
-}
-
-.team{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-weight:bold;
-  font-size:14px;
-}
-
-.team.away{
-  justify-content:flex-end;
-  text-align:right;
-}
-
-.team-logo{
-  width:30px;
-  height:30px;
-  object-fit:contain;
-}
-
-.score{
-  min-width:55px;
   text-align:center;
-  font-size:18px;
+  font-size:16px;
   font-weight:bold;
-}
-
-.time{
-  font-size:12px;
-  color:#9cffbc;
-  text-align:center;
-  margin-top:7px;
-}
-
-/* BOTON PRONOSTICOS */
-
-.prediction-btn{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border:1px solid #247d4a;
-  border-radius:7px;
-  background:#123c25;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.prediction-btn:active{
-  transform:scale(.98);
-}
-
-.prediction-box{
-  display:none;
-  margin-top:9px;
-  padding:12px;
-  border-radius:8px;
-  background:#071a0f;
-  border:1px solid #24623d;
-}
-
-.prediction-box.open{
-  display:block;
-}
-
-.prediction-title{
-  text-align:center;
-  color:#7cffae;
-  font-weight:bold;
-  margin-bottom:10px;
-}
-
-.prediction-row{
-  display:flex;
-  justify-content:space-between;
-  padding:8px 0;
-  border-bottom:1px solid #183d28;
-  font-size:13px;
-}
-
-.prediction-row:last-child{
-  border-bottom:0;
-}
-
-.prediction-pending{
-  text-align:center;
-  color:#aab9af;
-  font-size:12px;
   line-height:1.5;
 }
 
-.events{
-  margin-top:8px;
-  border-top:1px solid #183d28;
-  padding-top:7px;
-  font-size:11px;
-  color:#bbb;
+.score{
+  color:#19c37d;
+  font-size:19px;
+  margin:3px 0;
 }
 
-.no-games{
-  text-align:center;
-  padding:35px 15px;
-  color:#8ca494;
-}
-
-.loading{
-  text-align:center;
-  padding:40px 10px;
-  color:#8fffb6;
-}
-
-.refresh{
+.pred-button{
   width:100%;
-  border:0;
-  padding:12px;
-  border-radius:8px;
-  background:#0da653;
-  color:white;
-  font-weight:bold;
   margin-top:10px;
+  border:0;
+  border-radius:8px;
+  padding:11px;
+  background:#19c37d;
+  color:#042016;
+  font-weight:bold;
   cursor:pointer;
 }
 
-@media(max-width:600px){
+.predictions{
+  display:none;
+  margin-top:10px;
+  background:#0b3024;
+  border:1px solid #1b694d;
+  border-radius:9px;
+  padding:10px;
+}
 
-  header h1{font-size:22px}
+.predictions.open{
+  display:block;
+}
 
-  .team{font-size:12px}
+.pred-title{
+  text-align:center;
+  font-size:17px;
+  font-weight:bold;
+  color:#19c37d;
+  margin-bottom:4px;
+}
 
-  .team-logo{
-    width:25px;
-    height:25px;
-  }
+.pred-match{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:12px;
+}
 
-  .score{font-size:16px}
+.pred-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:9px 6px;
+  margin:5px 0;
+  background:#071d16;
+  border-radius:7px;
+  border-left:3px solid #19c37d;
+}
+
+.pred-name{
+  font-size:13px;
+}
+
+.pred-percent{
+  font-size:14px;
+  font-weight:bold;
+  color:#19c37d;
+}
+
+.pred-section{
+  margin-top:12px;
+  color:#d8f5e9;
+  font-weight:bold;
+  font-size:13px;
+}
+
+.note{
+  margin-top:10px;
+  font-size:10px;
+  color:#8bb8a8;
+  text-align:center;
+  line-height:1.4;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#a5cfc0;
+}
+
+.arrow{
+  font-size:12px;
 }
 </style>
 </head>
@@ -306,986 +260,572 @@ header p{
   <p>PARTIDOS DE FÚTBOL EN VIVO</p>
 </header>
 
+<div class="tabs">
+  <button class="tab active" onclick="cambiarTab('live',this)">🔴 EN VIVO</button>
+  <button class="tab" onclick="cambiarTab('today',this)">📅 HOY</button>
+  <button class="tab" onclick="cambiarTab('next',this)">⏭️ PRÓXIMOS</button>
+</div>
+
 <div class="container">
-
-  <div class="status" id="status">
-    Conectando con los partidos...
-  </div>
-
-  <div class="tabs">
-
-    <button class="tab active"
-            onclick="mostrarSeccion('live',this)">
-      🔴 EN VIVO
-    </button>
-
-    <button class="tab"
-            onclick="mostrarSeccion('today',this)">
-      📅 HOY
-    </button>
-
-    <button class="tab"
-            onclick="mostrarSeccion('next',this)">
-      ⏭️ PRÓXIMOS
-    </button>
-
-  </div>
-
-  <div id="live" class="section active">
-    <div class="loading">Cargando partidos en vivo...</div>
-  </div>
-
-  <div id="today" class="section">
-    <div class="loading">Cargando partidos...</div>
-  </div>
-
-  <div id="next" class="section">
-    <div class="loading">Cargando próximos partidos...</div>
-  </div>
-
-  <button class="refresh" onclick="cargarPartidos()">
-    🔄 ACTUALIZAR PARTIDOS
-  </button>
-
+  <div id="status" class="status">Cargando partidos...</div>
+  <div id="matches"></div>
 </div>
 
 <script>
 
-const API_URL="/api/football";
+const API_URL = "/api/football";
 
+let datos = {
+  enVivo: [],
+  partidosHoy: [],
+  partidosManana: [],
+  partidos: []
+};
 
-function valor(obj,claves,defecto=""){
-  if(!obj)return defecto;
+let tabActual = "live";
 
+/* =========================
+   UTILIDADES
+========================= */
+
+function buscar(obj, claves, defecto=""){
   for(const clave of claves){
-    if(obj[clave]!==undefined && obj[clave]!==null){
+    if(obj && obj[clave] !== undefined && obj[clave] !== null){
       return obj[clave];
     }
   }
-
   return defecto;
 }
 
-
-function obtenerFixture(item){
-  return valor(item,["fixture","partido"],{});
+function obtenerFixture(p){
+  return buscar(p,["fixture","partido"],{});
 }
 
-
-function obtenerLeague(item){
-  return valor(item,["league","liga"],{});
+function obtenerLiga(p){
+  return buscar(p,["league","liga"],{});
 }
 
-
-function obtenerTeams(item){
-  return valor(item,["teams","equipos"],{});
+function obtenerEquipos(p){
+  return buscar(p,["teams","equipos"],{});
 }
 
-
-function obtenerGoals(item){
-  return valor(item,["goals","goles"],{});
+function obtenerGoles(p){
+  return buscar(p,["goals","goles"],{});
 }
 
-
-function obtenerScore(item){
-  return valor(item,["score","marcador","resultado"],{});
+function obtenerMarcador(p){
+  return buscar(p,["score","marcador","resultado"],{});
 }
 
-
-function equipoLocal(teams){
-  return valor(teams,["home","local"],{});
+function nombreEquipo(e){
+  return buscar(e,["name","nombre"],"Equipo");
 }
 
-
-function equipoVisitante(teams){
-  return valor(teams,["away","visitante"],{});
+function banderaPais(p){
+  const liga = obtenerLiga(p);
+  return buscar(liga,["country","pais"],"Otros");
 }
 
-
-function nombreEquipo(team){
-  return valor(team,["name","nombre"],"Equipo");
+function nombreLiga(p){
+  const liga = obtenerLiga(p);
+  return buscar(liga,["name","nombre"],"Liga");
 }
 
+function fechaPartido(p){
 
-function logoEquipo(team){
-  return valor(team,["logo"],"");
-}
+  const fixture = obtenerFixture(p);
 
-
-function nombreLiga(league){
-  return valor(league,["name","nombre"],"Liga");
-}
-
-
-function paisLiga(league){
-  return valor(
-    league,
-    ["country","país","pais"],
-    "Otros"
+  let fecha = buscar(
+    fixture,
+    ["date","fecha","datetime","fechaHora"],
+    ""
   );
+
+  if(!fecha){
+    fecha = buscar(
+      p,
+      ["date","fecha","datetime","fechaHora"],
+      ""
+    );
+  }
+
+  return fecha;
 }
 
+function esLive(p){
+  const fixture = obtenerFixture(p);
 
-function logoLiga(league){
-  return valor(league,["logo"],"");
-}
-
-
-function estadoFixture(fixture){
-  return valor(
+  const status = buscar(
     fixture,
     ["status","estado"],
     {}
   );
-}
 
-
-function estadoCorto(status){
-  return valor(
+  const short = buscar(
     status,
-    ["short","corto"],
+    ["short","codigo"],
     ""
   );
-}
 
-
-function estadoLargo(status){
-  return valor(
+  const long = buscar(
     status,
-    ["long","largo"],
+    ["long","descripcion"],
     ""
   );
-}
 
-
-function minuto(status){
-  return valor(
-    status,
-    ["elapsed","transcurrido"],
-    null
+  return (
+    ["1H","2H","HT","ET","P","LIVE","INT","BT"].includes(short) ||
+    String(long).toLowerCase().includes("live") ||
+    String(long).toLowerCase().includes("en vivo")
   );
 }
 
+function horaYFecha(p){
 
-function fechaFixture(fixture){
-  return valor(
-    fixture,
-    ["date","fecha"],
-    ""
-  );
-}
+  const fecha = fechaPartido(p);
 
-
-/* FECHA Y HORA CORRECTAS */
-
-function fechaCompleta(fecha){
-
-  if(!fecha)return "";
-
-  const d=new Date(fecha);
-
-  if(isNaN(d.getTime()))return "";
-
-  const dia=d.toLocaleDateString("es-ES",{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  });
-
-  const hora=d.toLocaleTimeString("es-ES",{
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-
-  return `${dia} · ${hora}`;
-}
-
-
-function soloFecha(fecha){
-
-  if(!fecha)return "";
-
-  const d=new Date(fecha);
-
-  if(isNaN(d.getTime()))return "";
-
-  return d.toLocaleDateString("es-ES",{
-    day:"2-digit",
-    month:"2-digit",
-    year:"numeric"
-  });
-}
-
-
-function soloHora(fecha){
-
-  if(!fecha)return "";
-
-  const d=new Date(fecha);
-
-  if(isNaN(d.getTime()))return "";
-
-  return d.toLocaleTimeString("es-ES",{
-    hour:"2-digit",
-    minute:"2-digit"
-  });
-}
-
-
-function esEnVivo(item){
-
-  const fixture=obtenerFixture(item);
-  const status=estadoFixture(fixture);
-
-  const corto=String(
-    estadoCorto(status)
-  ).toUpperCase();
-
-  const largo=String(
-    estadoLargo(status)
-  ).toLowerCase();
-
-  if(
-    corto==="1H" ||
-    corto==="2H" ||
-    corto==="HT" ||
-    corto==="ET" ||
-    corto==="P" ||
-    corto==="LIVE"
-  ){
-    return true;
+  if(!fecha){
+    return "Horario no disponible";
   }
 
-  if(
-    largo.includes("first half") ||
-    largo.includes("second half") ||
-    largo.includes("primera mitad") ||
-    largo.includes("segunda mitad") ||
-    largo.includes("descanso") ||
-    largo.includes("en vivo")
-  ){
-    return true;
+  const d = new Date(fecha);
+
+  if(isNaN(d.getTime())){
+    return fecha;
   }
 
-  return false;
+  const dia = String(d.getDate()).padStart(2,"0");
+  const mes = String(d.getMonth()+1).padStart(2,"0");
+  const año = d.getFullYear();
+
+  const hora = String(d.getHours()).padStart(2,"0");
+  const minuto = String(d.getMinutes()).padStart(2,"0");
+
+  return `${dia}/${mes}/${año} · ${hora}:${minuto}`;
 }
 
+function marcador(p){
 
-function marcador(item){
+  const goles = obtenerGoles(p);
+  const score = obtenerMarcador(p);
 
-  const goals=obtenerGoals(item);
-
-  let home=valor(
-    goals,
+  const local = buscar(
+    goles,
     ["home","local"],
-    null
+    buscar(score,["home","local"],null)
   );
 
-  let away=valor(
-    goals,
+  const visitante = buscar(
+    goles,
     ["away","visitante"],
-    null
+    buscar(score,["away","visitante"],null)
   );
 
-  if(home!==null || away!==null){
-    return `${home ?? 0} - ${away ?? 0}`;
+  if(local === null && visitante === null){
+    return "";
   }
 
-  const score=obtenerScore(item);
+  return `${local ?? 0} - ${visitante ?? 0}`;
+}
 
-  const half=valor(
-    score,
-    ["halftime","medio tiempo"],
-    null
-  );
+/* =========================
+   PRONÓSTICOS
+========================= */
 
-  if(half){
+/*
+  IMPORTANTE:
+  Estos porcentajes se muestran LOCALMENTE.
+  No hacen ninguna consulta adicional a API-Football.
+*/
 
-    const h=valor(
-      half,
-      ["home","local"],
-      null
-    );
+function crearPronosticos(local, visitante){
 
-    const a=valor(
-      half,
-      ["away","visitante"],
-      null
-    );
+  const esJunior =
+    local.toLowerCase().includes("junior") &&
+    visitante.toLowerCase().includes("medell");
 
-    if(h!==null || a!==null){
-      return `${h ?? 0} - ${a ?? 0}`;
-    }
+  if(esJunior){
+
+    return `
+      <div class="pred-title">PRONÓSTICOS DEL PARTIDO</div>
+
+      <div class="pred-match">
+        ${local} vs ${visitante}
+      </div>
+
+      <div class="pred-section">⚽ 1X2</div>
+
+      <div class="pred-row">
+        <span class="pred-name">Junior</span>
+        <span class="pred-percent">29%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Empate</span>
+        <span class="pred-percent">26%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Independiente Medellín</span>
+        <span class="pred-percent">44%</span>
+      </div>
+
+      <div class="pred-section">⚽ Goles</div>
+
+      <div class="pred-row">
+        <span class="pred-name">Más 1.5 goles</span>
+        <span class="pred-percent">82%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Menos 3.5 goles</span>
+        <span class="pred-percent">76%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">BTTS — Sí</span>
+        <span class="pred-percent">63%</span>
+      </div>
+
+      <div class="pred-section">⚽ Córners</div>
+
+      <div class="pred-row">
+        <span class="pred-name">Más 6.5 córners</span>
+        <span class="pred-percent">78%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Menos 11.5 córners</span>
+        <span class="pred-percent">81%</span>
+      </div>
+
+      <div class="pred-section">⚽ Tarjetas</div>
+
+      <div class="pred-row">
+        <span class="pred-name">Más 3.5 tarjetas</span>
+        <span class="pred-percent">69%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Menos 5.5 tarjetas</span>
+        <span class="pred-percent">72%</span>
+      </div>
+
+      <div class="pred-section">⚽ Otros mercados</div>
+
+      <div class="pred-row">
+        <span class="pred-name">Doble oportunidad 1X</span>
+        <span class="pred-percent">55%</span>
+      </div>
+
+      <div class="pred-row">
+        <span class="pred-name">Doble oportunidad X2</span>
+        <span class="pred-percent">70%</span>
+      </div>
+
+      <div class="note">
+        Porcentajes orientativos de pronóstico.
+        No representan garantía de resultado.
+      </div>
+    `;
+
   }
 
-  return "-";
+  /*
+    Para los demás partidos mostramos la misma estructura,
+    pero sin inventar datos específicos.
+  */
+
+  return `
+    <div class="pred-title">PRONÓSTICOS DEL PARTIDO</div>
+
+    <div class="pred-match">
+      ${local} vs ${visitante}
+    </div>
+
+    <div class="pred-section">⚽ 1X2</div>
+
+    <div class="pred-row">
+      <span class="pred-name">${local}</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">Empate</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">${visitante}</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-section">⚽ Goles</div>
+
+    <div class="pred-row">
+      <span class="pred-name">Más 1.5 goles</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">Menos 3.5 goles</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">BTTS</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-section">⚽ Córners</div>
+
+    <div class="pred-row">
+      <span class="pred-name">Más 6.5 córners</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">Menos 11.5 córners</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-section">⚽ Tarjetas</div>
+
+    <div class="pred-row">
+      <span class="pred-name">Más 3.5 tarjetas</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-row">
+      <span class="pred-name">Menos 5.5 tarjetas</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="pred-section">⚽ Otros mercados</div>
+
+    <div class="pred-row">
+      <span class="pred-name">Próximamente</span>
+      <span class="pred-percent">—%</span>
+    </div>
+
+    <div class="note">
+      Los pronósticos detallados se conectarán posteriormente
+      sin realizar consultas automáticas para todos los partidos.
+    </div>
+  `;
 }
 
+/* =========================
+   MOSTRAR PARTIDOS
+========================= */
 
-function ordenarPartidos(lista){
+function mostrarPartidos(lista){
 
-  return [...lista].sort((a,b)=>{
+  const contenedor = document.getElementById("matches");
 
-    const fa=new Date(
-      fechaFixture(obtenerFixture(a))
-    ).getTime();
+  contenedor.innerHTML = "";
 
-    const fb=new Date(
-      fechaFixture(obtenerFixture(b))
-    ).getTime();
+  if(!lista || lista.length === 0){
 
-    if(isNaN(fa))return 1;
-    if(isNaN(fb))return -1;
+    contenedor.innerHTML = `
+      <div class="empty">
+        ⚽ No hay partidos disponibles en esta sección.
+      </div>
+    `;
 
-    return fa-fb;
-  });
+    return;
+  }
 
-}
+  const paises = {};
 
+  lista.forEach(p => {
 
-function agrupar(lista){
-
-  const paises={};
-
-  ordenarPartidos(lista).forEach(item=>{
-
-    const league=obtenerLeague(item);
-
-    const pais=paisLiga(league);
-    const liga=nombreLiga(league);
+    const pais = banderaPais(p);
+    const liga = nombreLiga(p);
 
     if(!paises[pais]){
-      paises[pais]={};
+      paises[pais] = {};
     }
 
     if(!paises[pais][liga]){
-
-      paises[pais][liga]={
-        logo:logoLiga(league),
-        partidos:[]
-      };
-
+      paises[pais][liga] = [];
     }
 
-    paises[pais][liga].partidos.push(item);
+    paises[pais][liga].push(p);
 
   });
 
-  return paises;
-}
+  Object.keys(paises).forEach(pais => {
 
+    const country = document.createElement("div");
+    country.className = "country";
 
-/* BOTON UNICO DE PRONOSTICOS */
-
-function abrirPronostico(id){
-
-  const caja=document.getElementById(
-    "pred-"+id
-  );
-
-  if(!caja)return;
-
-  caja.classList.toggle("open");
-
-}
-
-
-/* CREAR PARTIDO */
-
-function crearPartido(item,enVivo=false){
-
-  const fixture=obtenerFixture(item);
-  const teams=obtenerTeams(item);
-
-  const home=equipoLocal(teams);
-  const away=equipoVisitante(teams);
-
-  const status=estadoFixture(fixture);
-
-  const nombreHome=nombreEquipo(home);
-  const nombreAway=nombreEquipo(away);
-
-  const logoHome=logoEquipo(home);
-  const logoAway=logoEquipo(away);
-
-  const minutoJuego=minuto(status);
-
-  const id=valor(
-    fixture,
-    ["id"],
-    Math.random().toString(36).substring(2)
-  );
-
-  let estadoTexto="";
-
-  if(enVivo){
-
-    const corto=String(
-      estadoCorto(status)
-    ).toUpperCase();
-
-    if(corto==="HT"){
-      estadoTexto="DESCANSO";
-    }
-    else if(minutoJuego!==null){
-      estadoTexto=`${minutoJuego}'`;
-    }
-    else{
-      estadoTexto="EN VIVO";
-    }
-
-  }
-  else{
-
-    estadoTexto=
-      fechaCompleta(
-        fechaFixture(fixture)
-      );
-
-  }
-
-
-  const eventos=valor(
-    item,
-    ["events","eventos"],
-    []
-  );
-
-  let eventosHTML="";
-
-  if(
-    enVivo &&
-    Array.isArray(eventos) &&
-    eventos.length
-  ){
-
-    const ultimos=eventos.slice(-4);
-
-    eventosHTML=`
-      <div class="events">
-
-        ${ultimos.map(e=>{
-
-          const tiempo=valor(
-            e.time,
-            ["elapsed","transcurrido"],
-            ""
-          );
-
-          const jugador=valor(
-            e.player,
-            ["name","nombre"],
-            ""
-          );
-
-          const tipo=valor(
-            e,
-            ["type","tipo"],
-            ""
-          );
-
-          const detalle=valor(
-            e,
-            ["detail","detalle"],
-            ""
-          );
-
-          let icono="•";
-
-          const t=String(tipo).toLowerCase();
-
-          if(
-            t.includes("goal") ||
-            t.includes("gol")
-          ){
-            icono="⚽";
-          }
-          else if(
-            t.includes("card") ||
-            t.includes("tarjeta")
-          ){
-            icono="🟨";
-          }
-          else if(
-            t.includes("subst") ||
-            t.includes("sustit")
-          ){
-            icono="🔄";
-          }
-
-          return `
-            <div>
-              ${icono}
-              ${tiempo ? tiempo+"'" : ""}
-              ${jugador}
-              ${detalle ? " — "+detalle : ""}
-            </div>
-          `;
-
-        }).join("")}
-
+    country.innerHTML = `
+      <div class="country-title"
+           onclick="this.parentElement.classList.toggle('closed')">
+        <span>🌎 ${pais}</span>
+        <span class="arrow">▼</span>
       </div>
+
+      <div class="country-content"></div>
     `;
 
-  }
+    const countryContent =
+      country.querySelector(".country-content");
 
+    Object.keys(paises[pais]).forEach(liga => {
 
-  return `
+      const league = document.createElement("div");
+      league.className = "league";
 
-    <div class="match">
-
-      <div class="match-top">
-
-        <span class="${enVivo ? "status-live" : ""}">
-          ${enVivo ? "🔴 EN VIVO" : "⚽ PARTIDO"}
-        </span>
-
-        <span>
-          ${enVivo
-            ? estadoTexto
-            : fechaCompleta(fechaFixture(fixture))
-          }
-        </span>
-
-      </div>
-
-
-      <div class="teams">
-
-        <div class="team">
-
-          ${
-            logoHome
-            ?
-            `<img
-              class="team-logo"
-              src="${logoHome}"
-              onerror="this.style.display='none'"
-            >`
-            :
-            ""
-          }
-
-          <span>${nombreHome}</span>
-
+      league.innerHTML = `
+        <div class="league-title"
+             onclick="this.parentElement.classList.toggle('closed')">
+          <span>🏆 ${liga}</span>
+          <span class="arrow">▼</span>
         </div>
 
+        <div class="league-content"></div>
+      `;
 
-        <div class="score">
-          ${marcador(item)}
-        </div>
+      const leagueContent =
+        league.querySelector(".league-content");
 
+      paises[pais][liga].forEach(p => {
 
-        <div class="team away">
+        const equipos = obtenerEquipos(p);
 
-          <span>${nombreAway}</span>
+        const local = nombreEquipo(
+          buscar(equipos,["home","local"],{})
+        );
 
-          ${
-            logoAway
-            ?
-            `<img
-              class="team-logo"
-              src="${logoAway}"
-              onerror="this.style.display='none'"
-            >`
-            :
-            ""
-          }
+        const visitante = nombreEquipo(
+          buscar(equipos,["away","visitante"],{})
+        );
 
-        </div>
+        const live = esLive(p);
 
-      </div>
+        const partido = document.createElement("div");
+        partido.className = "match";
 
+        const fechaTexto =
+          live
+          ? "🔴 EN VIVO"
+          : horaYFecha(p);
 
-      <div class="time">
+        const marcadorTexto =
+          marcador(p);
 
-        ${
-          enVivo
-          ?
-          "Minuto: "+estadoTexto
-          :
-          "📅 "+soloFecha(fechaFixture(fixture))+
-          " · ⏰ "+soloHora(fechaFixture(fixture))
-        }
+        const id =
+          "pred_" +
+          Math.random().toString(36).substring(2,10);
 
-      </div>
+        partido.innerHTML = `
 
+          <div class="match-top">
 
-      ${eventosHTML}
-
-
-      <!-- UN SOLO BOTON -->
-
-      <button
-        class="prediction-btn"
-        onclick="abrirPronostico('${id}')"
-      >
-        🔮 PRONÓSTICOS
-      </button>
-
-
-      <div
-        class="prediction-box"
-        id="pred-${id}"
-      >
-
-        <div class="prediction-title">
-          🔮 PRONÓSTICOS DEL PARTIDO
-        </div>
-
-        <div class="prediction-pending">
-
-          <strong>
-            ${nombreHome} vs ${nombreAway}
-          </strong>
-
-          <br><br>
-
-          Aquí colocaremos los pronósticos actuales
-          del partido.
-
-          <br><br>
-
-          ⚽ 1X2<br>
-          ⚽ Más/Menos goles<br>
-          ⚽ BTTS<br>
-          ⚽ Córners<br>
-          ⚽ Tarjetas<br>
-          ⚽ Otros mercados
-
-          <br><br>
-
-          <small>
-            Los pronósticos se conectarán bajo demanda
-            para no gastar solicitudes de la API
-            innecesariamente.
-          </small>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-
-function crearGrupos(lista,enVivo=false){
-
-  if(
-    !Array.isArray(lista) ||
-    lista.length===0
-  ){
-
-    return `
-      <div class="no-games">
-        ⚽<br><br>
-        No hay partidos disponibles
-        en esta sección.
-      </div>
-    `;
-
-  }
-
-  const grupos=agrupar(lista);
-
-  let html="";
-
-
-  Object.keys(grupos)
-    .sort()
-    .forEach(pais=>{
-
-      const ligas=grupos[pais];
-
-      let total=0;
-
-      Object.values(ligas).forEach(l=>{
-        total+=l.partidos.length;
-      });
-
-
-      html+=`
-
-        <div class="country">
-
-          <div
-            class="country-title"
-            onclick="toggleElemento(this.nextElementSibling)"
-          >
-
-            <span>🌎 ${pais}</span>
-
-            <span>
-              ${total} partidos ▼
+            <span class="match-date">
+              ${fechaTexto}
             </span>
 
-          </div>
-
-
-          <div class="country-body">
-
-      `;
-
-
-      Object.keys(ligas).forEach(liga=>{
-
-        const info=ligas[liga];
-
-
-        html+=`
-
-          <div class="league">
-
-            <div
-              class="league-title"
-              onclick="toggleElemento(this.nextElementSibling)"
-            >
-
-              <div class="league-name">
-
-                ${
-                  info.logo
-                  ?
-                  `<img
-                    class="league-logo"
-                    src="${info.logo}"
-                    onerror="this.style.display='none'"
-                  >`
-                  :
-                  "🏆"
-                }
-
-                <span>${liga}</span>
-
-              </div>
-
-              <span>
-                ${info.partidos.length} ▼
-              </span>
-
-            </div>
-
-
-            <div class="matches">
-
-              ${
-                info.partidos
-                  .map(p=>crearPartido(p,enVivo))
-                  .join("")
-              }
-
-            </div>
+            ${
+              live
+              ? `<span class="live">● EN VIVO</span>`
+              : ""
+            }
 
           </div>
 
+          <div class="teams">
+
+            <div>${local}</div>
+
+            ${
+              marcadorTexto
+              ? `<div class="score">${marcadorTexto}</div>`
+              : `<div class="score">VS</div>`
+            }
+
+            <div>${visitante}</div>
+
+          </div>
+
+          <button
+            class="pred-button"
+            onclick="abrirPronosticos('${id}')">
+
+            🔮 PRONÓSTICOS
+
+          </button>
+
+          <div
+            id="${id}"
+            class="predictions">
+
+            ${crearPronosticos(local,visitante)}
+
+          </div>
         `;
+
+        leagueContent.appendChild(partido);
 
       });
 
-
-      html+=`
-
-          </div>
-
-        </div>
-
-      `;
+      countryContent.appendChild(league);
 
     });
 
+    contenedor.appendChild(country);
 
-  return html;
-
-}
-
-
-function toggleElemento(elemento){
-
-  if(!elemento)return;
-
-  if(
-    elemento.style.display==="none" ||
-    elemento.style.display===""
-  ){
-
-    elemento.style.display="block";
-
-  }
-  else{
-
-    elemento.style.display="none";
-
-  }
+  });
 
 }
 
+/* =========================
+   ABRIR PRONÓSTICOS
+========================= */
 
-function mostrarSeccion(id,boton){
+function abrirPronosticos(id){
 
-  document.querySelectorAll(".section")
-    .forEach(s=>s.classList.remove("active"));
+  const panel = document.getElementById(id);
 
-  document.getElementById(id)
-    .classList.add("active");
+  if(!panel) return;
+
+  panel.classList.toggle("open");
+
+}
+
+/* =========================
+   TABS
+========================= */
+
+function cambiarTab(tab, boton){
+
+  tabActual = tab;
 
   document.querySelectorAll(".tab")
-    .forEach(b=>b.classList.remove("active"));
+    .forEach(b => b.classList.remove("active"));
 
   boton.classList.add("active");
 
-}
+  let lista = [];
 
-
-async function cargarPartidos(){
-
-  const status=document.getElementById("status");
-
-  status.innerHTML=
-    "🔄 Actualizando partidos...";
-
-
-  try{
-
-    const respuesta=await fetch(
-      API_URL+"?t="+Date.now(),
-      {
-        cache:"no-store"
-      }
-    );
-
-
-    if(!respuesta.ok){
-      throw new Error(
-        "HTTP "+respuesta.status
-      );
-    }
-
-
-    const data=await respuesta.json();
-
-    console.log(
-      "RESPUESTA API:",
-      data
-    );
-
-
-    const enVivo=valor(
-      data,
-      ["enVivo","live"],
-      []
-    );
-
-
-    const hoy=valor(
-      data,
-      ["partidosHoy","hoy"],
-      []
-    );
-
-
-    const manana=valor(
-      data,
-      ["partidosManana","manana","proximos"],
-      []
-    );
-
-
-    const totalLive=Number(
-      valor(
-        data,
-        ["cantidadEnVivo"],
-        enVivo.length
-      )
-    );
-
-
-    const totalHoy=Number(
-      valor(
-        data,
-        ["cantidadHoy"],
-        hoy.length
-      )
-    );
-
-
-    const totalManana=Number(
-      valor(
-        data,
-        ["cantidadManana"],
-        manana.length
-      )
-    );
-
-
-    document.getElementById("live").innerHTML=
-      crearGrupos(enVivo,true);
-
-
-    document.getElementById("today").innerHTML=
-      crearGrupos(hoy,false);
-
-
-    document.getElementById("next").innerHTML=
-      crearGrupos(manana,false);
-
-
-    status.innerHTML=
-      `🟢 API CONECTADA · 🔴 ${totalLive} EN VIVO · 📅 ${totalHoy} HOY · ⏭️ ${totalManana} PRÓXIMOS`;
-
+  if(tab === "live"){
+    lista = datos.enVivo || [];
   }
-  catch(error){
 
-    console.error(error);
-
-    status.innerHTML=
-      "🔴 Error conectando con la API";
-
-
-    document.getElementById("live").innerHTML=
-      `
-        <div class="no-games">
-          ❌ No se pudieron cargar
-          los partidos.
-        </div>
-      `;
-
-
-    document.getElementById("today").innerHTML=
-      `
-        <div class="no-games">
-          ❌ No se pudieron cargar
-          los partidos.
-        </div>
-      `;
-
-
-    document.getElementById("next").innerHTML=
-      `
-        <div class="no-games">
-          ❌ No se pudieron cargar
-          los próximos partidos.
-        </div>
-      `;
-
+  if(tab === "today"){
+    lista = datos.partidosHoy || [];
   }
+
+  if(tab === "next"){
+    lista = datos.partidosManana || [];
+  }
+
+  mostrarPartidos(lista);
 
 }
 
-
-cargarPartidos();
-
-
-/* Actualización cada 60 segundos */
-
-setInterval(
-  cargarPartidos,
-  60000
-);
-
-</script>
-
-</body>
-</html>
+/* =========================
+   CARGAR API
+================
