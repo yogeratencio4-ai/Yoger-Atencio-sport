@@ -2,6 +2,8 @@ export default async function handler(req, res) {
   try {
     const home = String(req.query.home || "").trim();
     const away = String(req.query.away || "").trim();
+    const league = String(req.query.league || "").trim();
+    const country = String(req.query.country || "").trim();
 
     if (!home || !away) {
       return res.status(400).json({
@@ -9,19 +11,6 @@ export default async function handler(req, res) {
         error: "Faltan los equipos local y visitante"
       });
     }
-
-    /*
-      ============================================================
-      YOGER ATENCIO SPORT - MOTOR DE PRONÓSTICOS
-      ============================================================
-
-      Importante:
-      - No hace una petición nueva a API-Football por cada mercado.
-      - Para partidos sin información estadística suficiente,
-        NO inventamos porcentajes.
-      - Junior vs Independiente Medellín conserva el consenso
-        específico que ya verificamos.
-    */
 
     const normalizar = (texto) =>
       texto
@@ -33,8 +22,26 @@ export default async function handler(req, res) {
     const h = normalizar(home);
     const a = normalizar(away);
 
+    /*
+    ============================================================
+    YOGER ATENCIO SPORT
+    MOTOR DE PRONÓSTICOS
+
+    Este endpoint NO consulta API-Football.
+
+    Por lo tanto:
+    - No consume API_FOOTBALL_KEY.
+    - No consume créditos de API-Football.
+    - Trabaja con los datos que recibe el frontend.
+    - Cuando existe un consenso específico previamente verificado,
+      utiliza esos datos.
+    - Para los demás partidos utiliza un cálculo base solamente
+      cuando existen datos suficientes.
+    ============================================================
+    */
+
     // ============================================================
-    // CONSENSO ESPECÍFICO: JUNIOR vs INDEPENDIENTE MEDELLÍN
+    // CONSENSO ESPECÍFICO JUNIOR vs INDEPENDIENTE MEDELLÍN
     // ============================================================
 
     const esJuniorMedellin =
@@ -46,38 +53,32 @@ export default async function handler(req, res) {
          h.includes("medellin")));
 
     if (esJuniorMedellin) {
+
       const localEsJunior = h.includes("junior");
 
-      const datos = localEsJunior
+      const unoXdos = localEsJunior
         ? {
-            local: home,
-            visitante: away,
-            unoXdos: {
-              local: 34.9,
-              empate: 27.4,
-              visitante: 37.6
-            }
+            local: 34.9,
+            empate: 27.4,
+            visitante: 37.6
           }
         : {
-            local: home,
-            visitante: away,
-            unoXdos: {
-              local: 37.6,
-              empate: 27.4,
-              visitante: 34.9
-            }
+            local: 37.6,
+            empate: 27.4,
+            visitante: 34.9
           };
 
       return res.status(200).json({
         success: true,
 
         predictions: {
+
           partido: {
             local: home,
             visitante: away
           },
 
-          unoXdos: datos.unoXdos,
+          unoXdos,
 
           goles: {
             mas15: 72,
@@ -129,22 +130,24 @@ export default async function handler(req, res) {
     }
 
     // ============================================================
-    // OTROS PARTIDOS
+    // MOTOR BASE PARA TODOS LOS DEMÁS PARTIDOS
     // ============================================================
     //
-    // No vamos a fabricar porcentajes.
+    // Importante:
+    // No vamos a inventar una falsa "opinión de expertos".
     //
-    // El frontend podrá mostrar:
-    // "Sin datos específicos de consenso"
+    // Si el partido no tiene estadísticas suficientes recibidas
+    // desde el frontend, devolvemos estado de datos insuficientes.
     //
-    // Esto permite que TODOS los partidos tengan su botón
-    // de pronósticos sin mostrar información falsa.
+    // El siguiente paso puede alimentar este motor con estadísticas
+    // reales de forma eficiente y con caché.
     // ============================================================
 
-    return res.status(200).json({
+    const respuestaBase = {
       success: true,
 
       predictions: {
+
         partido: {
           local: home,
           visitante: away
@@ -177,18 +180,28 @@ export default async function handler(req, res) {
         fuentes: [],
 
         metodologia:
-          "No hay suficientes datos específicos de consenso para este partido.",
+          "Modelo Yoger pendiente de estadísticas específicas del partido.",
 
-        estado: "sin_datos_especificos"
+        estado: "datos_insuficientes",
+
+        liga: league,
+
+        pais: country
       }
-    });
+    };
+
+    return res.status(200).json(respuestaBase);
 
   } catch (error) {
-    console.error("Error en predictions.js:", error);
+
+    console.error(
+      "Error en predictions.js:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      error: "Error interno al calcular los pronósticos"
+      error: "Error interno del motor de pronósticos"
     });
   }
 }
