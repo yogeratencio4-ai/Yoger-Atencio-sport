@@ -1,338 +1,263 @@
-export default async function handler(request, response) {
-
-  const API_KEY = process.env.API_FOOTBALL_KEY;
-
-  if (!API_KEY) {
-    return response.status(500).json({
-      success: false,
-      error: "Falta API_FOOTBALL_KEY en Vercel"
-    });
-  }
-
-  const baseURL = "https://v3.football.api-sports.io";
-
-  const headers = {
-    "x-apisports-key": API_KEY
-  };
-
+export default async function handler(req, res) {
   try {
+    const API_KEY = process.env.API_FOOTBALL_KEY;
+
+    if (!API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: "Falta API_FOOTBALL_KEY en Vercel"
+      });
+    }
 
     const {
       fixtureId,
-      home,
-      away,
-      league,
-      country
-    } = request.query;
-
-    /*
-     * =====================================================
-     * NECESITAMOS EL ID DEL PARTIDO
-     * =====================================================
-     */
+      home = "",
+      away = "",
+      league = "",
+      country = ""
+    } = req.query;
 
     if (!fixtureId) {
-
-      return response.status(400).json({
+      return res.status(400).json({
         success: false,
         error: "Falta fixtureId"
       });
-
     }
-
-    /*
-     * =====================================================
-     * CONSULTAR PREDICCIÓN DE API-FOOTBALL
-     * =====================================================
-     */
 
     const url =
-      `${baseURL}/predictions?fixture=${encodeURIComponent(fixtureId)}`;
+      `https://v3.football.api-sports.io/predictions?fixture=${encodeURIComponent(
+        fixtureId
+      )}`;
 
-    const apiResponse =
-      await fetch(url, {
-        method: "GET",
-        headers
-      });
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-apisports-key": API_KEY
+      }
+    });
 
-    const data =
-      await apiResponse.json();
+    const data = await response.json();
 
-    /*
-     * =====================================================
-     * ERROR DE API
-     * =====================================================
-     */
-
-    if (!apiResponse.ok) {
-
-      return response.status(apiResponse.status).json({
-
+    // Error de API-Football
+    if (!response.ok || data.errors && Object.keys(data.errors).length > 0) {
+      return res.status(200).json({
         success: false,
-
-        fixture: fixtureId,
-
-        partido: {
-          local: home || null,
-          visitante: away || null
-        },
-
-        error:
-          data?.errors ||
-          "Error consultando predicción"
-
-      });
-
-    }
-
-    /*
-     * =====================================================
-     * ERRORES DEVUELTOS POR API-FOOTBALL
-     * =====================================================
-     */
-
-    if (
-      data?.errors &&
-      Object.keys(data.errors).length > 0
-    ) {
-
-      return response.status(200).json({
-
-        success: false,
-
         disponible: false,
-
-        fixture: fixtureId,
-
-        partido: {
-          local: home || null,
-          visitante: away || null
-        },
-
-        error: data.errors
-
+        error: data.errors || "Error consultando API-Football",
+        fixture: fixtureId
       });
-
     }
 
-    /*
-     * =====================================================
-     * RESULTADO
-     * =====================================================
-     */
-
-    const resultado =
-      data?.response?.[0];
-
-    if (!resultado) {
-
-      return response.status(200).json({
-
+    if (!data.response || !data.response.length) {
+      return res.status(200).json({
         success: true,
-
         disponible: false,
-
         fixture: fixtureId,
-
         partido: {
-          local: home || null,
-          visitante: away || null
+          local: home,
+          visitante: away
         },
-
-        predictions: null,
-
-        mensaje:
-          "API-Football no tiene predicción disponible para este partido."
-
+        liga: league,
+        pais: country,
+        mensaje: "No hay predicción disponible para este partido"
       });
-
     }
 
-    const pred =
-      resultado.predictions || {};
+    const item = data.response[0];
 
-    const percent =
-      pred.percent || {};
+    const prediction = item.predictions || {};
 
-    /*
-     * =====================================================
-     * 1X2
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // 1X2
+    // ---------------------------------------------------------
+
+    const percent = prediction.percent || {};
 
     const local =
-      percent.home ?? null;
+      convertirNumero(percent.home);
 
     const empate =
-      percent.draw ?? null;
+      convertirNumero(percent.draw);
 
     const visitante =
-      percent.away ?? null;
+      convertirNumero(percent.away);
 
-    /*
-     * =====================================================
-     * BTTS
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // GANADOR
+    // ---------------------------------------------------------
 
-    const bttsSi =
-      pred.btts?.yes ?? null;
+    const winnerName =
+      prediction.winner?.name ||
+      prediction.winner?.name ||
+      null;
 
-    const bttsNo =
-      pred.btts?.no ?? null;
+    const winnerComment =
+      prediction.winner?.comment ||
+      null;
 
-    /*
-     * =====================================================
-     * UNDER / OVER
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // UNDER / OVER
+    // ---------------------------------------------------------
 
     const underOver =
-      pred.under_over ?? null;
+      prediction.under_over ||
+      prediction.underOver ||
+      null;
 
-    /*
-     * =====================================================
-     * GANADOR
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // GOLES
+    // ---------------------------------------------------------
 
-    let ganador = null;
+    const goalsHome =
+      prediction.goals?.home ??
+      prediction.goals?.local ??
+      null;
 
-    if (pred.winner) {
+    const goalsAway =
+      prediction.goals?.away ??
+      prediction.goals?.visitante ??
+      null;
 
-      ganador =
-        pred.winner.name ?? null;
+    // ---------------------------------------------------------
+    // CONSEJO
+    // ---------------------------------------------------------
 
-    }
+    const advice =
+      prediction.advice ||
+      null;
 
-    /*
-     * =====================================================
-     * CONSEJO
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // WIN OR DRAW
+    // ---------------------------------------------------------
 
-    const consejo =
-      pred.advice ?? null;
+    const winOrDraw =
+      prediction.win_or_draw ??
+      prediction.winOrDraw ??
+      null;
 
-    /*
-     * =====================================================
-     * GOLES ESPERADOS
-     * =====================================================
-     */
+    // ---------------------------------------------------------
+    // EXTRACCIÓN DE PORCENTAJES
+    //
+    // Algunas respuestas pueden traer información adicional
+    // dentro de comparison. La guardamos para poder utilizarla.
+    // ---------------------------------------------------------
 
-    const golesLocal =
-      pred.goals?.home ?? null;
+    const comparison =
+      item.comparison || {};
 
-    const golesVisitante =
-      pred.goals?.away ?? null;
+    // ---------------------------------------------------------
+    // RESPUESTA
+    // ---------------------------------------------------------
 
-    /*
-     * =====================================================
-     * DOBLE OPORTUNIDAD
-     * =====================================================
-     */
-
-    const dobleOportunidad =
-      pred.win_or_draw ?? null;
-
-    /*
-     * =====================================================
-     * RESPUESTA PARA YOGER ATENCIO SPORT
-     * =====================================================
-     */
-
-    return response.status(200).json({
-
+    return res.status(200).json({
       success: true,
-
       disponible: true,
 
       fixture: fixtureId,
 
       partido: {
-
         local:
-          home || resultado.teams?.home?.name || null,
+          item.teams?.home?.name ||
+          home,
 
         visitante:
-          away || resultado.teams?.away?.name || null
-
+          item.teams?.away?.name ||
+          away
       },
 
       liga:
-        league || null,
+        item.league?.name ||
+        league,
 
       pais:
-        country || null,
+        item.league?.country ||
+        country,
 
       predictions: {
 
+        // 1X2
         unoXdos: {
-
-          local,
-          empate,
-          visitante
-
+          local: local,
+          empate: empate,
+          visitante: visitante
         },
 
+        // BTTS
         btts: {
-
-          si: bttsSi,
-          no: bttsNo
-
+          si: null,
+          no: null
         },
 
-        underOver,
+        // Más/Menos goles
+        underOver: underOver,
 
-        winner: {
-
-          name:
-            ganador
-
-        },
-
-        advice:
-          consejo,
-
+        // Goles estimados
         goles: {
-
-          local:
-            golesLocal,
-
-          visitante:
-            golesVisitante
-
+          local: goalsHome,
+          visitante: goalsAway
         },
 
-        winOrDraw:
-          dobleOportunidad
+        // Ganador
+        winner: {
+          name: winnerName,
+          comment: winnerComment
+        },
 
+        // Consejo
+        advice: advice,
+
+        // Doble oportunidad
+        winOrDraw: winOrDraw,
+
+        // Datos adicionales disponibles
+        comparison: comparison
       },
 
       fuente: "API-Football",
 
-      estado:
-        "prediccion_api_football"
-
+      estado: "prediccion_api_football"
     });
 
   } catch (error) {
 
-    console.error(
-      "ERROR PREDICTIONS:",
-      error
-    );
+    console.error("ERROR PREDICTIONS:", error);
 
-    return response.status(500).json({
-
+    return res.status(500).json({
       success: false,
-
-      error:
-        error?.message ||
-        "Error interno del servidor"
-
+      disponible: false,
+      error: error.message || "Error interno"
     });
+  }
+}
 
+
+// ============================================================
+// CONVERTIR PORCENTAJES
+// ============================================================
+
+function convertirNumero(valor) {
+
+  if (valor === null || valor === undefined) {
+    return null;
   }
 
+  if (typeof valor === "number") {
+    return valor;
+  }
+
+  if (typeof valor === "string") {
+
+    const limpio = valor
+      .replace("%", "")
+      .replace(",", ".")
+      .trim();
+
+    const numero = parseFloat(limpio);
+
+    return Number.isFinite(numero)
+      ? numero
+      : null;
+  }
+
+  return null;
 }
