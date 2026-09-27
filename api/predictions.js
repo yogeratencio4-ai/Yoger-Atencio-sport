@@ -1,6 +1,9 @@
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
+  res.setHeader(
+    "Cache-Control",
+    "s-maxage=300, stale-while-revalidate=600"
+  );
 
   const API_KEY = process.env.API_FOOTBALL_KEY;
 
@@ -36,49 +39,98 @@ export default async function handler(req, res) {
 
   try {
     /*
-      ============================================================
-      1. PEDIMOS PREDICCIONES + CUOTAS EN PARALELO
-      ============================================================
+    ============================================================
+    PREDICCIONES + CUOTAS
+    ============================================================
     */
 
-    const [predictionResponse, oddsResponse] = await Promise.all([
-      fetch(
-        `${BASE}/predictions?fixture=${encodeURIComponent(fixtureId)}`,
-        { headers }
-      ),
+    const [predictionResponse, oddsResponse] =
+      await Promise.all([
+        fetch(
+          `${BASE}/predictions?fixture=${encodeURIComponent(
+            fixtureId
+          )}`,
+          { headers }
+        ),
 
-      fetch(
-        `${BASE}/odds?fixture=${encodeURIComponent(fixtureId)}`,
-        { headers }
-      )
-    ]);
+        fetch(
+          `${BASE}/odds?fixture=${encodeURIComponent(
+            fixtureId
+          )}`,
+          { headers }
+        )
+      ]);
 
-    const predictionData = await predictionResponse.json();
-    const oddsData = await oddsResponse.json();
+    const predictionData =
+      await predictionResponse.json();
 
-    /*
-      ============================================================
-      2. COMPROBAR ERRORES DE API
-      ============================================================
-    */
-
-    const predictionErrors = predictionData?.errors || [];
-    const oddsErrors = oddsData?.errors || [];
+    const oddsData =
+      await oddsResponse.json();
 
     const prediction =
       predictionData?.response?.[0] ||
-      predictionData?.response ||
       null;
 
     /*
-      ============================================================
-      3. INFORMACIÓN DEL PARTIDO
-      ============================================================
+    ============================================================
+    FUNCIONES
+    ============================================================
     */
 
-    const fixtureInfo = prediction?.fixture || {};
-    const teams = prediction?.teams || {};
-    const league = prediction?.league || {};
+    function numero(valor) {
+      if (
+        valor === null ||
+        valor === undefined
+      ) {
+        return null;
+      }
+
+      const n = Number(
+        String(valor)
+          .replace("%", "")
+          .replace(",", ".")
+          .trim()
+      );
+
+      return Number.isFinite(n)
+        ? n
+        : null;
+    }
+
+    function porcentaje(valor) {
+      const n = numero(valor);
+
+      if (n === null) {
+        return null;
+      }
+
+      return Number(
+        Math.max(
+          0,
+          Math.min(100, n)
+        ).toFixed(1)
+      );
+    }
+
+    function normalizar(texto) {
+      return String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+    }
+
+    /*
+    ============================================================
+    INFORMACIÓN DEL PARTIDO
+    ============================================================
+    */
+
+    const teams =
+      prediction?.teams || {};
+
+    const league =
+      prediction?.league || {};
 
     const local =
       teams?.home?.name ||
@@ -101,53 +153,14 @@ export default async function handler(req, res) {
       "";
 
     /*
-      ============================================================
-      4. FUNCIONES AUXILIARES
-      ============================================================
+    ============================================================
+    1X2
+    ============================================================
     */
 
-    function numero(valor) {
-      if (valor === null || valor === undefined) return null;
-
-      if (typeof valor === "number") {
-        return Number.isFinite(valor) ? valor : null;
-      }
-
-      const limpio = String(valor)
-        .replace("%", "")
-        .replace(",", ".")
-        .trim();
-
-      const n = Number(limpio);
-
-      return Number.isFinite(n) ? n : null;
-    }
-
-    function porcentaje(valor) {
-      const n = numero(valor);
-
-      if (n === null) return null;
-
-      return Math.max(0, Math.min(100, Number(n.toFixed(1))));
-    }
-
-    function limpiarNombre(valor) {
-      if (!valor) return "";
-
-      return String(valor)
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .trim();
-    }
-
-    /*
-      ============================================================
-      5. 1X2 DE API-FOOTBALL
-      ============================================================
-    */
-
-    const percent = prediction?.predictions?.percent || {};
+    const percent =
+      prediction?.predictions?.percent ||
+      {};
 
     const unoXdos = {
       local: porcentaje(percent.home),
@@ -156,9 +169,9 @@ export default async function handler(req, res) {
     };
 
     /*
-      ============================================================
-      6. GANADOR / CONSEJO / OVER UNDER
-      ============================================================
+    ============================================================
+    GANADOR / CONSEJO / UNDER OVER
+    ============================================================
     */
 
     const ganador =
@@ -169,22 +182,19 @@ export default async function handler(req, res) {
       prediction?.predictions?.advice ||
       null;
 
-    const underOver =
+    const underOverAPI =
       prediction?.predictions?.under_over ||
       null;
 
-    const winOrDraw =
-      prediction?.predictions?.win_or_draw ??
-      null;
-
     /*
-      ============================================================
-      7. GOLES ESTIMADOS
-      ============================================================
+    ============================================================
+    GOLES ESTIMADOS
+    ============================================================
     */
 
     const golesAPI =
-      prediction?.predictions?.goals || {};
+      prediction?.predictions?.goals ||
+      {};
 
     const golesLocal =
       numero(golesAPI.home);
@@ -193,14 +203,9 @@ export default async function handler(req, res) {
       numero(golesAPI.away);
 
     /*
-      ============================================================
-      8. MODELO POISSON
-         Usamos los goles estimados de API-Football para calcular:
-
-         - Más 1.5
-         - Menos 3.5
-         - BTTS
-      ============================================================
+    ============================================================
+    POISSON
+    ============================================================
     */
 
     function factorial(n) {
@@ -218,8 +223,7 @@ export default async function handler(req, res) {
     function poisson(lambda, k) {
       if (
         lambda === null ||
-        !Number.isFinite(lambda) ||
-        lambda < 0
+        !Number.isFinite(lambda)
       ) {
         return null;
       }
@@ -231,79 +235,104 @@ export default async function handler(req, res) {
       );
     }
 
-    function probabilidadTotalGoles(lambda, limite) {
-      let suma = 0;
+    function probHasta(lambda, limite) {
+      let total = 0;
 
-      for (let k = 0; k <= limite; k++) {
-        const p = poisson(lambda, k);
+      for (let i = 0; i <= limite; i++) {
+        const p = poisson(lambda, i);
 
         if (p !== null) {
-          suma += p;
+          total += p;
         }
       }
 
-      return suma;
+      return total;
     }
 
-    let goles = {
-      mas15: null,
-      menos35: null
-    };
+    /*
+    ============================================================
+    MERCADOS BASE
+    ============================================================
+    */
 
     let btts = {
       si: null,
       no: null
     };
 
+    let goles = {
+      mas25: null,
+      menos45: null
+    };
+
+    /*
+    ============================================================
+    MODELO DE GOLES
+    ============================================================
+    */
+
     if (
       golesLocal !== null &&
       golesVisitante !== null
     ) {
-      const lambdaLocal = Math.max(0, golesLocal);
-      const lambdaVisitante = Math.max(0, golesVisitante);
+      const lambdaLocal =
+        Math.max(0, golesLocal);
+
+      const lambdaVisitante =
+        Math.max(0, golesVisitante);
 
       const lambdaTotal =
         lambdaLocal +
         lambdaVisitante;
 
       /*
-        P(0 goles)
+      MÁS 2.5
       */
-      const p0 =
-        poisson(lambdaTotal, 0);
 
-      /*
-        P(1 gol)
-      */
-      const p1 =
-        poisson(lambdaTotal, 1);
-
-      /*
-        Más de 1.5 = 1 - P(0) - P(1)
-      */
-      const over15 =
-        1 - p0 - p1;
-
-      /*
-        Menos de 3.5 = P(0)+P(1)+P(2)+P(3)
-      */
-      const under35 =
-        probabilidadTotalGoles(
+      const menos25 =
+        probHasta(
           lambdaTotal,
-          3
+          2
         );
 
+      const mas25 =
+        1 - menos25;
+
       /*
-        BTTS:
-        1 - que local marque 0
-          - que visitante marque 0
-          + que ambos marquen 0
+      MENOS 4.5
       */
+
+      const menos45 =
+        probHasta(
+          lambdaTotal,
+          4
+        );
+
+      goles = {
+        mas25: porcentaje(
+          mas25 * 100
+        ),
+
+        menos45: porcentaje(
+          menos45 * 100
+        )
+      };
+
+      /*
+      BTTS
+      */
+
       const localCero =
-        poisson(lambdaLocal, 0);
+        poisson(
+          lambdaLocal,
+          0
+        );
 
       const visitanteCero =
-        poisson(lambdaVisitante, 0);
+        poisson(
+          lambdaVisitante,
+          0
+        );
 
       const ambosCero =
         localCero *
@@ -315,42 +344,36 @@ export default async function handler(req, res) {
         visitanteCero +
         ambosCero;
 
-      goles = {
-        mas15: porcentaje(over15 * 100),
-        menos35: porcentaje(under35 * 100)
-      };
-
       btts = {
-        si: porcentaje(bttsSi * 100),
-        no: porcentaje((1 - bttsSi) * 100)
+        si: porcentaje(
+          bttsSi * 100
+        ),
+
+        no: porcentaje(
+          (1 - bttsSi) * 100
+        )
       };
     }
 
     /*
-      ============================================================
-      9. PROCESAR ODDS
-      ============================================================
+    ============================================================
+    ODDS
+    ============================================================
     */
 
     const bookmakers =
       oddsData?.response?.[0]?.bookmakers ||
       [];
 
-    /*
-      Guardamos todos los mercados encontrados.
-    */
-
     const mercados = [];
 
     for (const bookmaker of bookmakers) {
-      const bets = bookmaker?.bets || [];
-
-      for (const bet of bets) {
+      for (const bet of bookmaker?.bets || []) {
         mercados.push({
           bookmaker:
             bookmaker?.name || "",
 
-          bet:
+          nombre:
             bet?.name || "",
 
           values:
@@ -360,9 +383,9 @@ export default async function handler(req, res) {
     }
 
     /*
-      ============================================================
-      10. PROBABILIDAD IMPLÍCITA DE UNA CUOTA
-      ============================================================
+    ============================================================
+    PROBABILIDAD DE CUOTA
+    ============================================================
     */
 
     function probCuota(odd) {
@@ -379,24 +402,23 @@ export default async function handler(req, res) {
     }
 
     /*
-      ============================================================
-      11. BUSCAR MERCADO
-      ============================================================
+    ============================================================
+    BUSCAR MERCADO
+    ============================================================
     */
 
-    function encontrarMercado(patrones) {
+    function buscarMercado(patrones) {
       for (const mercado of mercados) {
         const nombre =
-          limpiarNombre(mercado.bet);
+          normalizar(mercado.nombre);
 
-        const coincide =
-          patrones.some((patron) =>
+        if (
+          patrones.some(p =>
             nombre.includes(
-              limpiarNombre(patron)
+              normalizar(p)
             )
-          );
-
-        if (coincide) {
+          )
+        ) {
           return mercado;
         }
       }
@@ -405,31 +427,30 @@ export default async function handler(req, res) {
     }
 
     /*
-      ============================================================
-      12. BUSCAR VALOR DENTRO DE UN MERCADO
-      ============================================================
+    ============================================================
+    BUSCAR OPCIÓN
+    ============================================================
     */
 
-    function buscarValor(
+    function buscarOpcion(
       mercado,
       patrones
     ) {
-      if (!mercado?.values) {
+      if (!mercado) {
         return null;
       }
 
       for (const item of mercado.values) {
-        const value =
-          limpiarNombre(item?.value);
+        const valor =
+          normalizar(item?.value);
 
-        const coincide =
-          patrones.some((patron) =>
-            value.includes(
-              limpiarNombre(patron)
+        if (
+          patrones.some(p =>
+            valor.includes(
+              normalizar(p)
             )
-          );
-
-        if (coincide) {
+          )
+        ) {
           return item;
         }
       }
@@ -438,103 +459,31 @@ export default async function handler(req, res) {
     }
 
     /*
-      ============================================================
-      13. BTTS DESDE ODDS
-      ============================================================
+    ============================================================
+    CONVERTIR DOS CUOTAS A PORCENTAJES
+    ============================================================
     */
 
-    const mercadoBTTS =
-      encontrarMercado([
-        "both teams to score",
-        "btts"
-      ]);
-
-    if (mercadoBTTS) {
-      const si =
-        buscarValor(
-          mercadoBTTS,
-          ["yes", "si"]
-        );
-
-      const no =
-        buscarValor(
-          mercadoBTTS,
-          ["no"]
-        );
-
-      const pSi =
-        probCuota(si?.odd);
-
-      const pNo =
-        probCuota(no?.odd);
-
-      if (
-        pSi !== null ||
-        pNo !== null
-      ) {
-        const total =
-          (pSi || 0) +
-          (pNo || 0);
-
-        if (total > 0) {
-          btts = {
-            si: porcentaje(
-              (pSi / total) * 100
-            ),
-            no: porcentaje(
-              (pNo / total) * 100
-            )
-          };
-        }
-      }
-    }
-
-    /*
-      ============================================================
-      14. BUSCAR OVER / UNDER 1.5
-      ============================================================
-    */
-
-    function obtenerOverUnder(
-      nombresMercado,
-      overPatrones,
-      underPatrones
+    function dosProbabilidades(
+      overItem,
+      underItem
     ) {
-      const mercado =
-        encontrarMercado(nombresMercado);
+      const p1 =
+        probCuota(overItem?.odd);
 
-      if (!mercado) {
-        return null;
-      }
-
-      const over =
-        buscarValor(
-          mercado,
-          overPatrones
-        );
-
-      const under =
-        buscarValor(
-          mercado,
-          underPatrones
-        );
-
-      const pOver =
-        probCuota(over?.odd);
-
-      const pUnder =
-        probCuota(under?.odd);
+      const p2 =
+        probCuota(underItem?.odd);
 
       if (
-        pOver === null &&
-        pUnder === null
+        p1 === null &&
+        p2 === null
       ) {
         return null;
       }
 
       const total =
-        (pOver || 0) +
-        (pUnder || 0);
+        (p1 || 0) +
+        (p2 || 0);
 
       if (total <= 0) {
         return null;
@@ -542,238 +491,301 @@ export default async function handler(req, res) {
 
       return {
         over: porcentaje(
-          (pOver / total) * 100
+          (p1 / total) * 100
         ),
+
         under: porcentaje(
-          (pUnder / total) * 100
+          (p2 / total) * 100
         )
       };
     }
 
     /*
-      ============================================================
-      15. INTENTAR ENCONTRAR O1.5
-      ============================================================
+    ============================================================
+    BTTS DESDE CUOTAS
+    ============================================================
     */
 
-    const goles15Odds =
-      obtenerOverUnder(
-        [
-          "goals over under",
-          "over under"
-        ],
-        [
-          "over 1.5"
-        ],
-        [
-          "under 1.5"
-        ]
-      );
-
-    if (goles15Odds) {
-      goles.mas15 =
-        goles15Odds.over;
-    }
-
-    /*
-      ============================================================
-      16. INTENTAR ENCONTRAR U3.5
-      ============================================================
-    */
-
-    const goles35Odds =
-      obtenerOverUnder(
-        [
-          "goals over under",
-          "over under"
-        ],
-        [
-          "over 3.5"
-        ],
-        [
-          "under 3.5"
-        ]
-      );
-
-    if (goles35Odds) {
-      goles.menos35 =
-        goles35Odds.under;
-    }
-
-    /*
-      ============================================================
-      17. CORNERS
-      ============================================================
-    */
-
-    const mercadoCorners =
-      encontrarMercado([
-        "corners over under",
-        "corner over under",
-        "total corners",
-        "corners"
+    const mercadoBTTS =
+      buscarMercado([
+        "both teams to score",
+        "btts"
       ]);
 
+    if (mercadoBTTS) {
+      const si =
+        buscarOpcion(
+          mercadoBTTS,
+          ["yes", "si"]
+        );
+
+      const no =
+        buscarOpcion(
+          mercadoBTTS,
+          ["no"]
+        );
+
+      const resultado =
+        dosProbabilidades(
+          si,
+          no
+        );
+
+      if (resultado) {
+        btts = {
+          si: resultado.over,
+          no: resultado.under
+        };
+      }
+    }
+
+    /*
+    ============================================================
+    MÁS 2.5 GOLES
+    ============================================================
+    */
+
+    const mercadoGoles =
+      buscarMercado([
+        "goals over under",
+        "over under"
+      ]);
+
+    if (mercadoGoles) {
+      const over25 =
+        buscarOpcion(
+          mercadoGoles,
+          ["over 2.5"]
+        );
+
+      const under25 =
+        buscarOpcion(
+          mercadoGoles,
+          ["under 2.5"]
+        );
+
+      const resultado =
+        dosProbabilidades(
+          over25,
+          under25
+        );
+
+      if (resultado) {
+        goles.mas25 =
+          resultado.over;
+      }
+    }
+
+    /*
+    ============================================================
+    MENOS 4.5 GOLES
+    ============================================================
+    */
+
+    if (mercadoGoles) {
+      const over45 =
+        buscarOpcion(
+          mercadoGoles,
+          ["over 4.5"]
+        );
+
+      const under45 =
+        buscarOpcion(
+          mercadoGoles,
+          ["under 4.5"]
+        );
+
+      const resultado =
+        dosProbabilidades(
+          over45,
+          under45
+        );
+
+      if (resultado) {
+        goles.menos45 =
+          resultado.under;
+      }
+    }
+
+    /*
+    ============================================================
+    CORNERS
+    ============================================================
+    */
+
     let corners = {
-      mas65: null,
+      mas75: null,
       menos115: null
     };
 
+    const mercadoCorners =
+      buscarMercado([
+        "corners over under",
+        "corner over under",
+        "total corners"
+      ]);
+
     if (mercadoCorners) {
-      const over65 =
-        buscarValor(
+      const over75 =
+        buscarOpcion(
           mercadoCorners,
-          [
-            "over 6.5",
-            "over 6",
-            "+6.5"
-          ]
+          ["over 7.5"]
+        );
+
+      const under75 =
+        buscarOpcion(
+          mercadoCorners,
+          ["under 7.5"]
         );
 
       const under115 =
-        buscarValor(
+        buscarOpcion(
           mercadoCorners,
-          [
-            "under 11.5",
-            "under 11",
-            "-11.5"
-          ]
+          ["under 11.5"]
         );
 
-      const pOver65 =
-        probCuota(over65?.odd);
+      const resultado75 =
+        dosProbabilidades(
+          over75,
+          under75
+        );
 
-      const pUnder115 =
-        probCuota(under115?.odd);
+      if (resultado75) {
+        corners.mas75 =
+          resultado75.over;
+      }
 
-      corners = {
-        mas65:
-          pOver65 !== null
-            ? porcentaje(pOver65)
-            : null,
+      if (under115) {
+        const p =
+          probCuota(
+            under115.odd
+          );
 
-        menos115:
-          pUnder115 !== null
-            ? porcentaje(pUnder115)
-            : null
-      };
+        if (p !== null) {
+          corners.menos115 =
+            porcentaje(p);
+        }
+      }
     }
 
     /*
-      ============================================================
-      18. TARJETAS
-      ============================================================
+    ============================================================
+    TARJETAS
+    ============================================================
     */
 
+    let tarjetas = {
+      mas25: null,
+      menos55: null
+    };
+
     const mercadoTarjetas =
-      encontrarMercado([
+      buscarMercado([
         "cards over under",
         "total cards",
         "cards"
       ]);
 
-    let tarjetas = {
-      mas35: null,
-      menos55: null
-    };
-
     if (mercadoTarjetas) {
-      const over35 =
-        buscarValor(
+      const over25 =
+        buscarOpcion(
           mercadoTarjetas,
-          [
-            "over 3.5",
-            "over 3",
-            "+3.5"
-          ]
+          ["over 2.5"]
+        );
+
+      const under25 =
+        buscarOpcion(
+          mercadoTarjetas,
+          ["under 2.5"]
         );
 
       const under55 =
-        buscarValor(
+        buscarOpcion(
           mercadoTarjetas,
-          [
-            "under 5.5",
-            "under 5",
-            "-5.5"
-          ]
+          ["under 5.5"]
         );
 
-      const pOver35 =
-        probCuota(over35?.odd);
+      const resultado25 =
+        dosProbabilidades(
+          over25,
+          under25
+        );
 
-      const pUnder55 =
-        probCuota(under55?.odd);
+      if (resultado25) {
+        tarjetas.mas25 =
+          resultado25.over;
+      }
 
-      tarjetas = {
-        mas35:
-          pOver35 !== null
-            ? porcentaje(pOver35)
-            : null,
+      if (under55) {
+        const p =
+          probCuota(
+            under55.odd
+          );
 
-        menos55:
-          pUnder55 !== null
-            ? porcentaje(pUnder55)
-            : null
-      };
+        if (p !== null) {
+          tarjetas.menos55 =
+            porcentaje(p);
+        }
+      }
     }
 
     /*
-      ============================================================
-      19. OTROS MERCADOS
-      ============================================================
+    ============================================================
+    DOBLE OPORTUNIDAD
+    ============================================================
     */
 
-    const otros = [];
+    const dobleOportunidad = {
+      "1X": null,
+      "X2": null,
+      "12": null
+    };
 
-    if (winOrDraw !== null) {
-      otros.push({
-        mercado: "Doble oportunidad",
-        opcion: "1X",
-        porcentaje:
-          winOrDraw === true
-            ? unoXdos.local !== null &&
-              unoXdos.empate !== null
-              ? porcentaje(
-                  unoXdos.local +
-                  unoXdos.empate
-                )
-              : null
-            : null
-      });
-    }
+    const mercadoDoble =
+      buscarMercado([
+        "double chance",
+        "doble oportunidad"
+      ]);
 
-    if (underOver) {
-      otros.push({
-        mercado: "Predicción goles API",
-        opcion: underOver,
-        porcentaje: null
-      });
+    if (mercadoDoble) {
+      for (const item of mercadoDoble.values) {
+        const valor =
+          normalizar(item?.value);
+
+        const p =
+          probCuota(item?.odd);
+
+        if (p === null) continue;
+
+        if (valor === "1x") {
+          dobleOportunidad["1X"] =
+            porcentaje(p);
+        }
+
+        if (valor === "x2") {
+          dobleOportunidad["X2"] =
+            porcentaje(p);
+        }
+
+        if (valor === "12") {
+          dobleOportunidad["12"] =
+            porcentaje(p);
+        }
+      }
     }
 
     /*
-      ============================================================
-      20. ESTADO GENERAL
-      ============================================================
-    */
-
-    const tienePrediccion =
-      prediction !== null;
-
-    const tieneOdds =
-      mercados.length > 0;
-
-    /*
-      ============================================================
-      21. RESPUESTA FINAL
-      ============================================================
+    ============================================================
+    RESPUESTA
+    ============================================================
     */
 
     return res.status(200).json({
       success: true,
 
       disponible:
-        tienePrediccion ||
-        tieneOdds,
+        prediction !== null ||
+        mercados.length > 0,
 
       fixture: fixtureId,
 
@@ -788,13 +800,15 @@ export default async function handler(req, res) {
       predictions: {
         unoXdos,
 
-        goles,
-
         btts,
+
+        goles,
 
         corners,
 
         tarjetas,
+
+        dobleOportunidad,
 
         winner: {
           nombre: ganador
@@ -802,64 +816,48 @@ export default async function handler(req, res) {
 
         advice: consejo,
 
-        underOver,
-
-        winOrDraw,
+        underOver: underOverAPI,
 
         golesEstimados: {
           local: golesLocal,
           visitante: golesVisitante
-        },
-
-        otros
+        }
       },
 
       fuente: {
         prediccion: "API-Football",
-        mercados: tieneOdds
-          ? "Cuotas disponibles en API-Football"
-          : null
-      },
-
-      metodologia: {
-        unoXdos:
-          "Probabilidades proporcionadas por API-Football",
-
-        goles:
-          "Probabilidad de cuotas cuando existe el mercado; si no, modelo Poisson usando los goles estimados por API-Football",
-
-        btts:
-          "Probabilidad de cuotas cuando existe el mercado; si no, modelo Poisson usando los goles estimados por API-Football",
-
-        corners:
-          "Probabilidad implícita de cuotas cuando API-Football publica el mercado",
-
-        tarjetas:
-          "Probabilidad implícita de cuotas cuando API-Football publica el mercado"
+        cuotas:
+          mercados.length > 0
+            ? "API-Football Odds"
+            : null
       },
 
       estado:
-        tienePrediccion
-          ? "prediccion_api_football"
-          : tieneOdds
-            ? "odds_disponibles"
+        prediction !== null
+          ? "prediccion_completa"
+          : mercados.length > 0
+            ? "cuotas_disponibles"
             : "sin_datos",
 
       errores: {
         predictions:
-          predictionErrors,
+          predictionData?.errors || [],
 
         odds:
-          oddsErrors
+          oddsData?.errors || []
       }
     });
 
   } catch (error) {
-    console.error("ERROR PREDICCIONES:", error);
+    console.error(
+      "ERROR PREDICCIONES:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      error: "Error consultando API-Football",
+      error:
+        "Error consultando API-Football",
       detalle: error.message
     });
   }
